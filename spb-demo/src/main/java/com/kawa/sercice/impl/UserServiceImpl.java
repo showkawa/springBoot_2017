@@ -23,7 +23,4 @@ public class UserServiceImpl implements UserService {
 		PageHelper.startPage(Integer.parseInt(params.get("page").toString()) , Integer.parseInt(params.get("rows").toString()));
 		return userDao.queryUserList(params);
 	}
-	
-
-
 }
