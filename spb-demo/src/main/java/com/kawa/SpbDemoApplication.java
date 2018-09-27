@@ -11,6 +11,18 @@ import org.springframework.core.env.Environment;
 
 import com.alibaba.druid.pool.DruidDataSource;
 
+
+/**
+ * 1.@SpringBootApplication => SpringBoot的主配置类，运行这个类的main方法来启动SpringBoot应用
+ * 		1.1 @SpringBootConfiguration  =>表示spring boot的配置类
+ * 		1.2 @EnableAutoConfiguration =>开启自动配置功能
+ * 			1.2.1 @AutoConfigurationPackage => 自动配置包
+ * 			1.2.2 @Import(EnableAutoConfigurationImportSelector.class)
+ * 				=> 	Spring底层注解@Import给容器中导入一个组件，将主配置类（SpringBootApplication）的所在的
+ * 					包及下面所有子包里面的所有组件扫描到Spring容器
+ *
+ *
+ */
 @SpringBootApplication
 public class SpbDemoApplication {
 
