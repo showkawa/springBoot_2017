@@ -1,7 +1,9 @@
 package com.kawa.pojo;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.Date;
 import java.util.List;
@@ -13,8 +15,15 @@ import java.util.Map;
  */
 @Component
 @ConfigurationProperties(prefix = "brian")
+//@Validated  对配置文件加校验
 public class Brian {
-
+    /**
+     *@ConfigurationProperties 可以批量注入
+     *
+     * @Value  注入单个单个的属性
+     *
+     */
+//    @Value("${brian.kawaname}")
     private Date  kawadate;
     private Map<String, Object> obj;
     private List<String> lists;
