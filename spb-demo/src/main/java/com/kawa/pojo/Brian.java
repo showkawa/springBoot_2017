@@ -2,6 +2,7 @@ package com.kawa.pojo;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 
@@ -14,6 +15,7 @@ import java.util.Map;
  *      告诉SpringBoot将本类中的所有属性和配置文件中相关的配置进行绑定
  */
 @Component
+//@PropertySource(value = {"classpath:application.yml"}) 加载指定的配置文件
 @ConfigurationProperties(prefix = "brian")
 //@Validated  对配置文件加校验
 public class Brian {

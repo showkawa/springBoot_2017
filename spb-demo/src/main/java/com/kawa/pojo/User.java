@@ -70,11 +70,18 @@ public class User {
 	}
 	public User() {
 		super();
-	} 
-    
-    
-	
-	
+	}
 
-	
+	@Override
+	public String toString() {
+		return "User{" +
+				"id=" + id +
+				", username='" + username + '\'' +
+				", password='" + password + '\'' +
+				", phone='" + phone + '\'' +
+				", email='" + email + '\'' +
+				", created=" + created +
+				", updated=" + updated +
+				'}';
+	}
 }

@@ -17,10 +17,11 @@ server:
   port: 8099
 
 
-#  test yml
+#  配置文件占位符
 brian:
-  kawadate: 2019/09/22
+#  kawadate: 2019/09/22
   obj: {k1: vi,k2: v2}
   lists: [a,b,c]
   user:
-    id: 999999999
+    id: ${random.int[100,999]} #随机数 ${random.int} ${random.value} ${random.long} ${random.int(10)}
+    password: ${brian.kawadate:default}_love #占位符变量没有值，默认取冒号后面的值
