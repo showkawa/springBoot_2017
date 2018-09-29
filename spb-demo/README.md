@@ -1,10 +1,11 @@
-1.springboot热部署
+博客地址
 
-2.springboot集成mybatis
+5.springboot加载配置文件优先级顺序 https://www.cnblogs.com/hlkawa/p/9723838.html
 
-3.springboot配置日志
+4.springboot配置拦截器和全局异常捕捉 https://www.cnblogs.com/hlkawa/p/7352867.html
 
-4.springboot配置拦截器和全局异常捕捉
+3.springboot配置日志  https://www.cnblogs.com/hlkawa/p/7352843.html
 
-5.springboot分页查询
+2.springboot集成mybatis https://www.cnblogs.com/hlkawa/p/7352699.html
 
+1.springboot热部署 https://www.cnblogs.com/hlkawa/p/7352678.html
