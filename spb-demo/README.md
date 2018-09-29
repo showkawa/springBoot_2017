@@ -1,4 +1,5 @@
 博客地址
+6.springboot自动配置原理和@Conditional https://www.cnblogs.com/hlkawa/p/9724742.html
 
 5.springboot加载配置文件优先级顺序 https://www.cnblogs.com/hlkawa/p/9723838.html
 
