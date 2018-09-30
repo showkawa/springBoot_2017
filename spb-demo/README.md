@@ -1,4 +1,5 @@
 
+7.springboot配置嵌入式Servlet容器  https://www.cnblogs.com/hlkawa/p/9728404.html
 
 6.springboot自动配置原理和@Conditional https://www.cnblogs.com/hlkawa/p/9724742.html
 
