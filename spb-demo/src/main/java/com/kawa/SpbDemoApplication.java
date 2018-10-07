@@ -1,15 +1,9 @@
 package com.kawa;
 
-import javax.sql.DataSource;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.web.servlet.ServletComponentScan;
-import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
-
-import com.alibaba.druid.pool.DruidDataSource;
 
 
 /**
@@ -37,7 +31,7 @@ public class SpbDemoApplication {
 	 	 *				就把该连接重新放到数据池中,方便下次使用调用. 	
 	 	 * @return
 	 	 */
-	    @Bean(destroyMethod =  "close")
+	    /*@Bean(destroyMethod =  "close")
 	    public DataSource dataSource() {
 	        DruidDataSource dataSource = new DruidDataSource();
 	        dataSource.setUrl(env.getProperty("spring.datasource.url"));
@@ -61,7 +55,7 @@ public class SpbDemoApplication {
 	        //是否缓存preparedStatement，也就是PSCache
 	        dataSource.setPoolPreparedStatements(false);
 	        return dataSource;
-	    }
+	    }*/
 	
 	
 }

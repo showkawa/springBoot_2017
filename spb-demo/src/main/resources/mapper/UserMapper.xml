@@ -22,7 +22,7 @@
 	<select id="queryUserList" resultType="User">
 		SELECT 
 		<include refid="columnList"/>
-		 FROM tb_user
+		 FROM user
 		 <include refid="userList"/>
 	</select>
 

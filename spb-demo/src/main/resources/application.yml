@@ -1,3 +1,44 @@
+
+
+
+
+
+
+
+
+#主配置开发环境
+spring:
+  profiles:
+    active: dev
+    #时间格式化
+  ackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    #时区设置
+  jackson:
+    time-zone: Asia/Chongqing
+
+#配置springboot默认的context-path
+server:
+  context-path: /kawa
+  port: 8099
+#日志设置
+logging:
+  config: classpath:log4j2-dev.xml
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #  yml 语法
 # 字面量: 数字 字符串 布尔
 #  ========K: V （字符串默认不加上单引号或双引号）
@@ -13,8 +54,7 @@
 #      - b
 #      - c
 #行内写法 attr:[a,b,c]
-server:
-  port: 8099
+
 
 
 #  配置文件占位符

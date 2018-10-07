@@ -4,8 +4,6 @@ package com.kawa.config;
 import com.kawa.fliter.MyFilter;
 import com.kawa.listener.MyListener;
 import com.kawa.servlet.MyServlet;
-import org.springframework.boot.context.embedded.ConfigurableEmbeddedServletContainer;
-import org.springframework.boot.context.embedded.EmbeddedServletContainerCustomizer;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
@@ -17,7 +15,7 @@ import java.util.Arrays;
 @Configuration
 public class SpbMvcConfig {
 
-    @Bean
+/*    @Bean
     public EmbeddedServletContainerCustomizer embeddedServletContainerCustomizer(){
         return new EmbeddedServletContainerCustomizer() {
             //定制嵌入式的Servlet容器的相关规则
@@ -26,7 +24,7 @@ public class SpbMvcConfig {
                    configurableEmbeddedServletContainer.setPort(8888);
             }
         };
-    }
+    }*/
 
     /**
      * 注册Servlet三大组件
