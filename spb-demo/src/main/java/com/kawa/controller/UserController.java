@@ -1,25 +1,19 @@
 package com.kawa.controller;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpRequest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.github.pagehelper.PageInfo;
 import com.kawa.pojo.User;
 import com.kawa.pojo.UserQuery;
 import com.kawa.pojo.UserQueryList;
 import com.kawa.sercice.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 
@@ -55,6 +49,31 @@ public class UserController {
 		Integer total = new Long(pageInfo.getTotal()).intValue();
 		queryList.setTotleRecords(total);
 		return new ResponseEntity<UserQueryList>(queryList,HttpStatus.OK);
+	}
+
+
+	@RequestMapping(path="/addUser",method=RequestMethod.POST)
+	public ResponseEntity addUsers(@RequestBody User user){
+		 userService.insertUser(user);
+		return new ResponseEntity(user,HttpStatus.OK);
+	}
+
+	@RequestMapping(path="/updateUser",method=RequestMethod.POST)
+	public ResponseEntity updateUser(@RequestBody User user){
+		userService.updateUser(user);
+		return new ResponseEntity(user,HttpStatus.OK);
+	}
+
+	@RequestMapping(path="/deleteUserById/{id}",method=RequestMethod.GET)
+	public ResponseEntity deleteUserById(@PathVariable Long id){
+		userService.deleteUserById(id);
+		return new ResponseEntity(id,HttpStatus.OK);
+	}
+
+	@RequestMapping(path="/queryUserById/{id}",method=RequestMethod.GET)
+	public ResponseEntity queryUserById(@PathVariable Long id){
+		User user = userService.queryUserById(id);
+		return new ResponseEntity(user,HttpStatus.OK);
 	}
 
 }
