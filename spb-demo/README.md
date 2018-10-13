@@ -1,3 +1,8 @@
+10.springbootSpringBoot消息中间件RabbitMQ  https://www.cnblogs.com/hlkawa/p/9785030.html
+
+9.springbootCache缓存和Redis缓存  https://www.cnblogs.com/hlkawa/p/9773428.html
+
+8.springboot嵌入式Servlet容器自动配置原理和容器启动原理  https://www.cnblogs.com/hlkawa/p/9736226.html
 
 7.springboot配置嵌入式Servlet容器  https://www.cnblogs.com/hlkawa/p/9728404.html
 

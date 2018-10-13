@@ -1,5 +1,8 @@
 package com.kawa.spbdemo;
 
+import com.kawa.config.Contents;
+import com.kawa.mq.ManageMQService;
+import com.kawa.mq.SendMessageService;
 import com.kawa.pojo.Brian;
 import com.kawa.pojo.User;
 import com.kawa.sercice.UserService;
@@ -8,9 +11,9 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -25,12 +28,11 @@ public class SpbDemoApplicationTests {
     @Autowired
     UserService userService;
 
+    @Autowired
+    ManageMQService manageMQService;
 
     @Autowired
-    RedisTemplate redisTemplate;
-
-    @Autowired
-    StringRedisTemplate stringRedisTemplate;
+    SendMessageService sendMessageService;
 
     @Test
     public void contextLoads() {
@@ -40,26 +42,43 @@ public class SpbDemoApplicationTests {
 //		}
     }
 
-   // @Test
-    public void operateStringDate() {
-       // User user = userService.queryUserById((long) 1);
-        stringRedisTemplate.opsForValue().append("kawa","147筒");
-        /*stringRedisTemplate.opsForList().leftPush("kawaList","五条");
-        stringRedisTemplate.opsForList().leftPush("kawaList","三万");*/
+    @Test
+    public void removeQueue(){
+        manageMQService.removeQueue("brian.sh");
+        manageMQService.removeQueue("brian.sz");
+        manageMQService.removeQueue("huang.sz");
     }
 
     @Test
-    public void operateDate() {
-        User user = userService.queryUserById((long) 1);
-        redisTemplate.opsForValue().set("user1",user);
+    public void removeExchange(){
+        manageMQService.removeExchange("brian.direct");
+        manageMQService.removeExchange("brian.fanout");
+        manageMQService.removeExchange("brian.topic");
     }
 
     @Test
-    public void getDate() {
-        String kawa = stringRedisTemplate.opsForValue().get("kawa");
-        System.out.println("---------------------Get string data..." + kawa);
-        User user = (User) redisTemplate.opsForValue().get("user1");
-        System.out.println("---------------------Get user data..." + user);
+    public void sendMessage() {
+        manageMQService.createQueue("brian.test");
+        manageMQService.createExchange("brian",Contents.DIRECT_EXCHANGE);
+        manageMQService.createBinding("brian.test","brian","mymq");
+        Brian brian = new Brian();
+        User user = new User();
+        user.setId((long) 12345678);
+        user.setUsername("cassiel");
+        user.setPassword("#fyds");
+        List<String> list = new ArrayList<>();
+        list.add("我");
+        list.add("爱");
+        list.add("你");
+        list.add("中");
+        list.add("国");
+        Map<String,Object> map = new HashMap<>();
+        map.put("123","包邮");
+        brian.setKawadate(new Date());
+        brian.setLists(list);
+        brian.setObj(map);
+        brian.setUser(user);
+        sendMessageService.sendMessage("brian","mymq",brian);
     }
 
 
