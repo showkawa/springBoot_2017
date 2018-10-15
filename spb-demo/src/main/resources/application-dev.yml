@@ -18,6 +18,19 @@ spring:
     virtual-host: /
     #值为true可实现消息确认
     publisher-confirms: true
+   #配置邮件
+  mail:
+    username: 1092249319@qq.com
+    password: vmgcojjlmulehcje
+    host: smtp.qq.com
+    #开启ssl安全协议(不开启报错连接超时)
+    properties:
+     mail:
+      smtp:
+       ssl:
+        enable: true
+
+
 
 #指定bean所在包
 mybatis:

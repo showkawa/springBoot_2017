@@ -6,6 +6,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.core.env.Environment;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 
 /**
@@ -22,6 +24,8 @@ import org.springframework.core.env.Environment;
 @SpringBootApplication
 @EnableCaching
 @EnableRabbit
+@EnableAsync//开启异步任务
+@EnableScheduling
 public class SpbDemoApplication {
 
 	public static void main(String[] args) {

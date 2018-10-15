@@ -1,6 +1,7 @@
 package com.kawa.controller;
 
 import com.github.pagehelper.PageInfo;
+import com.kawa.job.AsyncService;
 import com.kawa.pojo.User;
 import com.kawa.pojo.UserQuery;
 import com.kawa.pojo.UserQueryList;
@@ -25,6 +26,9 @@ public class UserController {
 	
 	@Autowired
 	UserService userService;
+
+	@Autowired
+	AsyncService asyncService;
 	
 	@RequestMapping(path="/getAll",method=RequestMethod.POST)
 	public ResponseEntity<UserQueryList> queryUsers(HttpServletRequest request,@RequestBody UserQuery userQuery){
@@ -76,4 +80,9 @@ public class UserController {
 		return new ResponseEntity(user,HttpStatus.OK);
 	}
 
+	@GetMapping("/async")
+	public String testJob(){
+	    asyncService.brianAsync();
+        return "Good job";
+	}
 }
