@@ -21,7 +21,7 @@ spring:
    #配置邮件
   mail:
     username: 1092249319@qq.com
-    password: vmgcojjlmulehcje
+    password: xxxxxxxxxxxxxxxxx
     host: smtp.qq.com
     #开启ssl安全协议(不开启报错连接超时)
     properties:
