@@ -1,9 +1,21 @@
 package com.kawa.pojo;
 
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 public class Worker {
     private String wName;
     private String wNumber;
     private boolean wFlag = false;
+    Lock lock = new ReentrantLock();
+
+    public Lock getLock() {
+        return lock;
+    }
+
+    public void setLock(Lock lock) {
+        this.lock = lock;
+    }
 
     public String getwName() {
         return wName;
@@ -29,12 +41,4 @@ public class Worker {
         this.wFlag = wFlag;
     }
 
-    @Override
-    public String toString() {
-        return "Worker{" +
-                "wName='" + wName + '\'' +
-                ", wNumber='" + wNumber + '\'' +
-                ", wFlag=" + wFlag +
-                '}';
-    }
 }
