@@ -30,3 +30,7 @@
 
 #### 1.JAVA多线程(一) Thread & Runnable https://www.cnblogs.com/hlkawa/p/9852007.html
 
+#### 2.JAVA多线程(二) 并发队列和阻塞队列 https://www.cnblogs.com/hlkawa/p/9870151.html
+
+
+
