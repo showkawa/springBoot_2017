@@ -28,9 +28,13 @@
 
 ### JAVA进阶(二) 多线程与高并发
 
-#### 1.JAVA多线程(一) Thread & Runnable https://www.cnblogs.com/hlkawa/p/9852007.html
+#### 3.JAVA多线程(三) 线程池和锁的深度化 https://www.cnblogs.com/hlkawa/p/9872136.html
 
 #### 2.JAVA多线程(二) 并发队列和阻塞队列 https://www.cnblogs.com/hlkawa/p/9870151.html
+
+#### 1.JAVA多线程(一) Thread & Runnable https://www.cnblogs.com/hlkawa/p/9852007.html
+
+
 
 
 
