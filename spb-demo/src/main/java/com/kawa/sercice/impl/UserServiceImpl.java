@@ -1,24 +1,23 @@
 package com.kawa.sercice.impl;
 
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import com.github.pagehelper.PageHelper;
+import com.kawa.dao.UserDao;
+import com.kawa.pojo.User;
+import com.kawa.sercice.UserService;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import com.github.pagehelper.PageHelper;
-import com.kawa.dao.UserDao;
-import com.kawa.pojo.User;
-import com.kawa.sercice.UserService;
+import javax.annotation.Resource;
+import java.util.List;
+import java.util.Map;
 
 
 @Service
 public class UserServiceImpl implements UserService {
 	
-	@Autowired
+	@Resource
 	UserDao userDao;
 
 

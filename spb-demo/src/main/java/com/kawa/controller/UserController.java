@@ -5,6 +5,7 @@ import com.kawa.job.AsyncService;
 import com.kawa.pojo.User;
 import com.kawa.pojo.UserQuery;
 import com.kawa.pojo.UserQueryList;
+import com.kawa.sercice.BrianService;
 import com.kawa.sercice.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 /**
  * 
@@ -23,20 +25,24 @@ import java.util.Map;
  */
 @RestController
 public class UserController {
-	
+
 	@Autowired
 	UserService userService;
 
 	@Autowired
 	AsyncService asyncService;
-	
-	@RequestMapping(path="/getAll",method=RequestMethod.POST)
-	public ResponseEntity<UserQueryList> queryUsers(HttpServletRequest request,@RequestBody UserQuery userQuery){
-		if(userQuery.getPage() == null){
+
+	@Autowired
+	BrianService brianService;
+
+
+	@RequestMapping(path = "/getAll", method = RequestMethod.POST)
+	public ResponseEntity<UserQueryList> queryUsers(HttpServletRequest request, @RequestBody UserQuery userQuery) {
+		if (userQuery.getPage() == null) {
 			//第一页从1开始而不是0
 			userQuery.setPage(1);
 		}
-		if(userQuery.getRows() == null){
+		if (userQuery.getRows() == null) {
 			userQuery.setRows(10);
 		}
 		Map<String, Object> map = new HashMap<>();
@@ -52,37 +58,55 @@ public class UserController {
 		queryList.setTotlePage(pageInfo.getPages());
 		Integer total = new Long(pageInfo.getTotal()).intValue();
 		queryList.setTotleRecords(total);
-		return new ResponseEntity<UserQueryList>(queryList,HttpStatus.OK);
+		return new ResponseEntity<UserQueryList>(queryList, HttpStatus.OK);
 	}
 
 
-	@RequestMapping(path="/addUser",method=RequestMethod.POST)
-	public ResponseEntity addUsers(@RequestBody User user){
-		 userService.insertUser(user);
-		return new ResponseEntity(user,HttpStatus.OK);
+	@RequestMapping(path = "/addUser", method = RequestMethod.POST)
+	public ResponseEntity addUsers(@RequestBody User user) {
+		userService.insertUser(user);
+		return new ResponseEntity(user, HttpStatus.OK);
 	}
 
-	@RequestMapping(path="/updateUser",method=RequestMethod.POST)
-	public ResponseEntity updateUser(@RequestBody User user){
+	@RequestMapping(path = "/updateUser", method = RequestMethod.POST)
+	public ResponseEntity updateUser(@RequestBody User user) {
 		userService.updateUser(user);
-		return new ResponseEntity(user,HttpStatus.OK);
+		return new ResponseEntity(user, HttpStatus.OK);
 	}
 
-	@RequestMapping(path="/deleteUserById/{id}",method=RequestMethod.GET)
-	public ResponseEntity deleteUserById(@PathVariable Long id){
+	@RequestMapping(path = "/deleteUserById/{id}", method = RequestMethod.GET)
+	public ResponseEntity deleteUserById(@PathVariable Long id) {
 		userService.deleteUserById(id);
-		return new ResponseEntity(id,HttpStatus.OK);
+		return new ResponseEntity(id, HttpStatus.OK);
 	}
 
-	@RequestMapping(path="/queryUserById/{id}",method=RequestMethod.GET)
-	public ResponseEntity queryUserById(@PathVariable Long id){
+	@RequestMapping(path = "/queryUserById/{id}", method = RequestMethod.GET)
+	public ResponseEntity queryUserById(@PathVariable Long id) {
 		User user = userService.queryUserById(id);
-		return new ResponseEntity(user,HttpStatus.OK);
+		return new ResponseEntity(user, HttpStatus.OK);
 	}
 
 	@GetMapping("/async")
-	public String testJob(){
-	    asyncService.brianAsync();
-        return "Good job";
+	public String testJob() {
+		asyncService.brianAsync();
+		return "Good job";
+	}
+
+	@GetMapping("/loop/sendMsg")
+	public void loopSendMsg() {
+		try {
+			brianService.sendMessageByThredPool();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@PostMapping("/loop/sendMsg/userInfo")
+	public ResponseEntity addUserInfo2MQ(@RequestBody User user) throws ExecutionException, InterruptedException {
+		brianService.sendMessageByThredPool(user);
+		return new ResponseEntity(user, HttpStatus.OK);
+
 	}
 }

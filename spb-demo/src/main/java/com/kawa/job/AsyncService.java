@@ -28,12 +28,13 @@ public class AsyncService {
             brianMail.sendEmail();
         } catch (InterruptedException e) {
             e.printStackTrace();
+
         }
         logger.debug("异步任务");
     }
 
     @Scheduled(cron = "0/5 * * * * *")
     public void brianScheduling() {
-        logger.debug("定时任务");
+        logger.debug("定时任务" + Runtime.getRuntime().availableProcessors());
     }
 }
