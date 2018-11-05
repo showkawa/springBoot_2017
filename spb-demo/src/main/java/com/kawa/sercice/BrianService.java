@@ -33,6 +33,8 @@ public class BrianService {
     @Resource(name = "brianThreadPool")
     private ThreadPoolTaskExecutor executor;
 
+    List<Future> futureslist = new ArrayList<>();
+
 
 
     @RabbitListener(queues = "brian.test")
@@ -81,13 +83,16 @@ public class BrianService {
     public void sendMessageByThredPool(User user) throws ExecutionException, InterruptedException {
             Future<String> future = executor.submit(() -> {
                 sendMessageService.sendMessage("brian","mymq",user);
+                logger.info("线程 [ " + Thread.currentThread().getName() + " ] 推送消息到MQ成功! " + new Date());
                 return Thread.currentThread().getName();
             });
-        if(future.isDone() && !future.isCancelled()){
+           // futureslist.add(future);
+
+       /* if(future.isDone() && !future.isCancelled()){
             String i = (String) future.get();
             logger.info("线程 [ " + i + " ] 推送消息到MQ成功! " + new Date());
         } else {
             Thread.sleep(1);
-        }
+        }*/
     }
 }
