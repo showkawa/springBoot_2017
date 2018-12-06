@@ -17,5 +17,42 @@
 2.多用组合少用继承;用行为类组合，而不是行为的继承。更具弹性
 ```
 
+#### 2.观察者模式
 
+```java
+观察者模式：
+对象之间多对一之间的一种依赖设计方案，被依赖的对象为Subject,依赖的对象为Observer,Subject通知Observer变化
+```
+
+2.1 观察者模式就像定牛奶
+
+1）奶站，Subject
+
+2）用户，Observer
+
+2.2 Subject:登记注册，移除和通知
+
+```java
+<interface>
+  Subject
+-----------
+registerObserver()
+removeObserver()
+notifyObserver()
+```
+
+2.3 Observer: 接收输入
+
+```java
+<interface>
+ Observer
+-----------
+update()
+```
+
+#### 3.装饰者模式
+
+```java
+动态的将新功能附加到对象上。在对象功能扩展方面，它比继承更有弹性。
+```
 
