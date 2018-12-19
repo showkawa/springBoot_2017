@@ -17,7 +17,8 @@ import java.util.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class SpbDemoApplicationTests {
+//@Ignore
+public class SpbCoreApplicationTests {
 
     @Autowired
     Brian brian;

@@ -26,10 +26,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableRabbit
 @EnableAsync//开启异步任务
 @EnableScheduling
-public class SpbDemoApplication {
+public class SpbCoreApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(SpbDemoApplication.class, args);
+		SpringApplication.run(SpbCoreApplication.class, args);
 	}
 	
 	 @Autowired

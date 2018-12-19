@@ -1,11 +1,12 @@
 package com.kawa.interceptor;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * 
@@ -15,7 +16,7 @@ import org.springframework.web.servlet.ModelAndView;
  */
 public class LoginInterceptor  implements HandlerInterceptor{
 	
-	private final static  Logger logger = Logger.getLogger(LoginInterceptor.class);   
+	private final static  Logger logger = LoggerFactory.getLogger(LoginInterceptor.class);
 
 	@Override
 	public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception exception)
