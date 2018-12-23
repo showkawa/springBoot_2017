@@ -1,11 +1,3 @@
-
-
-
-
-
-
-
-
 #主配置开发环境
 spring:
   profiles:
@@ -19,8 +11,9 @@ spring:
 
 #配置springboot默认的context-path
 server:
-  context-path: /kawa
-  port: 8099
+  port: 8002
+  servlet:
+    context-path: /kawa
 #日志设置
 logging:
   config: classpath:log4j2-dev.xml

@@ -29,6 +29,9 @@ spring:
       smtp:
        ssl:
         enable: true
+#服务名
+  application:
+    name: brian-query-service
 
 
 
@@ -37,6 +40,15 @@ mybatis:
   type-aliases-package: com.kawa.pojo
 #指定映射文件
   mapper-locations: classpath:mapper/*.xml
+
+
+#eureka主机名，会在控制页面中显示
+eureka:
+#eureka注册中心服务器地址
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8001/eureka/
+
 
 
 
