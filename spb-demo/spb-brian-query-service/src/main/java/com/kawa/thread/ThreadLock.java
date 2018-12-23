@@ -24,51 +24,51 @@ public class ThreadLock {
 
     }
 
-    class InputUserL extends  Thread {
+class InputUserL extends  Thread {
 
 
-        Worker worker;
-        Condition condition;
-        public InputUserL(Worker worker,Condition condition) {
-            this.worker = worker;
-            this.condition = condition;
-        }
+    Worker worker;
+    Condition condition;
+    public InputUserL(Worker worker,Condition condition) {
+        this.worker = worker;
+        this.condition = condition;
+    }
 
-        @Override
-        public void run() {
-            int count = 0;
-            while (true){
-              //  synchronized (worker){
-                worker.getLock().lock();
-                try {
-                    if (worker.getwFlag()) {
-                        try {
-                           // worker.wait();
-                            condition.await();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+    @Override
+    public void run() {
+        int count = 0;
+        while (true){
+          //  synchronized (worker){
+            worker.getLock().lock();
+            try {
+                if (worker.getwFlag()) {
+                    try {
+                       // worker.wait();
+                        condition.await();
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                    if (count == 1) {
-                        worker.setwName("AAA");
-                        worker.setwNumber("222222");
-                    } else {
-                        worker.setwName("UUU");
-                        worker.setwNumber("555555");
-                    }
-                    count = (count + 1) % 2;
-                    worker.setwFlag(true);
-                    //worker.notify();
-                    condition.signal();
-                } catch (Exception e){
-                    e.printStackTrace();
-                }finally {
-                    worker.getLock().unlock();
                 }
-                //}
+                if (count == 1) {
+                    worker.setwName("AAA");
+                    worker.setwNumber("222222");
+                } else {
+                    worker.setwName("UUU");
+                    worker.setwNumber("555555");
+                }
+                count = (count + 1) % 2;
+                worker.setwFlag(true);
+                //worker.notify();
+                condition.signal();
+            } catch (Exception e){
+                e.printStackTrace();
+            }finally {
+                worker.getLock().unlock();
             }
+            //}
         }
     }
+}
 
     class OutputUserL extends  Thread {
 

@@ -22,5 +22,5 @@ public interface UserDao {
 
 	User queryUserById(Long id);
 
-	List<User> queryUserList(Map<String,Object> params);
+	List<User> queryUserList(Map<String, Object> params);
 }

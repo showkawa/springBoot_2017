@@ -6,21 +6,29 @@
         <groupId>com.kawa</groupId>
         <artifactId>spb-demo</artifactId>
         <version>0.0.2</version>
+        <relativePath/>
     </parent>
 
     <groupId>com.kawa</groupId>
     <artifactId>spb-core</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>spb-core</name>
+    <packaging>jar</packaging>
     <description>控制中心</description>
 
+    <properties>
+        <cloud.version>2.0.2.RELEASE</cloud.version>
+    </properties>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
+    <dependencies>
+        <!--eureka server -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+            <version>${cloud.version}</version>
+        </dependency>
+
+    </dependencies>
+
+
 </project>

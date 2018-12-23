@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface UserService {
-	List<User> queryUserList(Map<String,Object> params);
+	List<User> queryUserList(Map<String, Object> params);
 	Integer insertUser(User user);
 	Boolean updateUser(User user);
 	Integer deleteUserById(Long id);

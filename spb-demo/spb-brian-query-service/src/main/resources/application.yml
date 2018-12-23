@@ -1,13 +1,29 @@
+
+
+
+
+
+
+
+
 #主配置开发环境
 spring:
   profiles:
     active: dev
+    #时间格式化
+  ackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    #时区设置
+  jackson:
+    time-zone: Asia/Chongqing
 
-
-
-
-
-
+#配置springboot默认的context-path
+server:
+  context-path: /kawa
+  port: 8099
+#日志设置
+logging:
+  config: classpath:log4j2-dev.xml
 
 
 

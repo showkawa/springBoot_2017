@@ -1,13 +1,13 @@
-package com.kawa.spbcore;
+package com.kawa;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class SpbCoreApplication {
+public class SpbBrianQueryServiceApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(SpbCoreApplication.class, args);
+        SpringApplication.run(SpbBrianQueryServiceApplication.class, args);
     }
 
 }
