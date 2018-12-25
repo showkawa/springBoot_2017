@@ -15,7 +15,7 @@
 		<module>spb-core</module>
 		<module>spb-job</module>
 		<module>spb-brian-query-service</module>
-
+		<module>spb-mq</module>
 	</modules>
 
 	<parent>

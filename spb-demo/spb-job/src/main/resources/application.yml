@@ -1,0 +1,12 @@
+server:
+  port: 8003
+
+spring:
+  application:
+    name: brian-job
+
+eureka:
+#eureka注册中心服务器地址
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8001/eureka/
