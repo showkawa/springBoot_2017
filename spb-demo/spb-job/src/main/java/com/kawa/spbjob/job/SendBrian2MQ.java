@@ -19,7 +19,7 @@ public class SendBrian2MQ {
     @Scheduled(cron = "0/5 * * * * *")
     public void brianScheduling() {
         Object obj = null;
-        //obj = queryBrainById.queryBrian(null);
+        obj = queryBrainById.queryBrian(null);
         logger.info("<<<< query brian >>>> :" + obj.toString());
     }
 }
