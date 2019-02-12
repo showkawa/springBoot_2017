@@ -11,8 +11,9 @@ public class QueryBrainById {
     @Autowired
     RestTemplate restTemplate;
 
+
     public Object queryBrian(Long id){
-        Object forObject = restTemplate.getForObject("http://brian-query-service/kawa/queryUserById/1",Object.class);
+        Object forObject = restTemplate.getForObject("http://brian-query-service/kawa/queryUserById/33",Object.class);
         return forObject;
     }
 }
