@@ -1,0 +1,60 @@
+#主配置开发环境
+spring:
+  profiles:
+    active: dev
+    #时间格式化
+  ackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    #时区设置
+  jackson:
+    time-zone: Asia/Chongqing
+
+#配置springboot默认的context-path
+server:
+  port: 8005
+  servlet:
+    context-path: /kawa
+#日志设置
+logging:
+  config: classpath:log4j2-dev.xml
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#  yml 语法
+# 字面量: 数字 字符串 布尔
+#  ========K: V （字符串默认不加上单引号或双引号）
+#    双引号：不会转义字符串里面的特殊字符;特殊字符会作为本身想表达的意思
+#        name: "zs \n li" 输出 zs 换行 li
+#     单引号：回转义特殊字符，特殊字符最终只是一个普通的字符串
+#        name: 'zs \n li' 输出 zs \n li
+#  ===========对象(属性和值) Map(键值对)
+#      K:V
+#  ===========数组（list set）
+#    attr:
+#      - a
+#      - b
+#      - c
+#行内写法 attr:[a,b,c]
+
+
+
+#  配置文件占位符
+brian:
+#  kawadate: 2019/09/22
+  obj: {k1: vi,k2: v2}
+  lists: [a,b,c]
+  user:
+    id: ${random.int[100,999]} #随机数 ${random.int} ${random.value} ${random.long} ${random.int(10)}
+    password: ${brian.kawadate:default}_love #占位符变量没有值，默认取冒号后面的值

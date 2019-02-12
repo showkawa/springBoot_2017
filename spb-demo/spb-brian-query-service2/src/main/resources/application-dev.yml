@@ -6,30 +6,6 @@ spring:
     password: 123456
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
-#配置redis数据库
-  redis:
-    host: 10.0.75.1
-#配置rabbitMQ
-
-  rabbitmq:
-    host: 10.0.75.1
-    port: 5672
-    username: guest
-    password: guest
-    virtual-host: /
-    #值为true可实现消息确认
-    publisher-confirms: true
-   #配置邮件
-  mail:
-    username: 1092249319@qq.com
-    password: xxxxxxxxxxxxxxxxx
-    host: smtp.qq.com
-    #开启ssl安全协议(不开启报错连接超时)
-    properties:
-     mail:
-      smtp:
-       ssl:
-        enable: true
 #服务名
   application:
     name: brian-query-service
