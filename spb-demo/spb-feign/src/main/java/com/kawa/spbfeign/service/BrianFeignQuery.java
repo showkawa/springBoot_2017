@@ -6,7 +6,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-@FeignClient(value="brian-query-service",path = "/kawa")
+@FeignClient(value="brian-query-service",path = "/kawa",fallback = BrianQueryFallback.class)
 public interface BrianFeignQuery {
     @RequestMapping("/queryUserById/{id}")
     public User queryUserById(@PathVariable("id") Long id);
