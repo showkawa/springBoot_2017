@@ -1,0 +1,13 @@
+server:
+  port: 8007
+  servlet:
+      context-path: /kawa
+spring:
+  application:
+    name: brian-feign
+
+eureka:
+#eureka注册中心服务器地址
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8001/eureka/
