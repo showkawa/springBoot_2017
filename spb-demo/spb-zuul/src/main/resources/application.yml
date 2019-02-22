@@ -1,0 +1,19 @@
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8001/eureka/
+server:
+  port: 8006
+spring:
+  application:
+    name: brian-zuul
+  main:
+    allow-bean-definition-overriding: true
+zuul:
+  routes:
+    api-a:
+      path: /api-job/**
+      service-id: brian-job
+    api-b:
+      path: /api-query/**
+      service-id: brian-query-service

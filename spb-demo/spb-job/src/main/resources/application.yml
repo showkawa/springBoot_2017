@@ -1,6 +1,7 @@
 server:
   port: 8003
-
+  servlet:
+      context-path: /kawa
 spring:
   application:
     name: brian-job
