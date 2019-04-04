@@ -11,6 +11,7 @@ public class FixedThreadPool {
     public static void main(String[] args) {
         //最多有三个线程在同事执行任务
         ExecutorService threadPool = Executors.newFixedThreadPool(3);
+
         for(int i=1;i<=15;i++){
             int count =i;
             threadPool.execute(new Runnable() {
@@ -20,5 +21,6 @@ public class FixedThreadPool {
                 }
             });
         }
+
     }
 }

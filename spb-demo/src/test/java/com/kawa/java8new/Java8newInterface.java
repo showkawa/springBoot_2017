@@ -12,12 +12,16 @@ public class Java8newInterface {
 
     public static void main(String[] args) {
         BrianInterface2.brianStatic();
+        BrainClass bs = new BrainClass();
+        bs.brianDefault();
         System.out.println(BrainClass.kawa);
 
     }
 
 
-    class BrainClass implements  BrianInterface,BrianInterface2 { }
+     static class  BrainClass implements  BrianInterface,BrianInterface2 {
+
+    }
 
     interface BrianInterface {
         default void brianDefault (){

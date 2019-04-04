@@ -21,7 +21,6 @@ public class ThreadSync {
 
 class InputUser extends  Thread {
 
-
     Worker worker;
     public InputUser(Worker worker) {
         this.worker = worker;
@@ -73,12 +72,11 @@ class OutputUser extends  Thread {
                      e.printStackTrace();
                  }
              }
-                System.out.println("取值：{ " + worker.getwName() + "  " + worker.getwNumber()+ " }");
+             System.out.println("取值：{ " + worker.getwName() + "  " + worker.getwNumber()+ " }");
              worker.setwFlag(false);
              worker.notify();
             }
         }
-
     }
 }
 
