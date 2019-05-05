@@ -18,7 +18,7 @@
 
 #### 3.springboot配置日志  https://www.cnblogs.com/hlkawa/p/7352843.html
 
-#### 2.springboot集成mybatis https://www.cnblogs.com/hlkawa/p/7352699.html
+#### 2.springboot(二)整合mybatis 多数据源和事务管理 https://www.cnblogs.com/hlkawa/p/7352699.html
 
 #### 1.springboot热部署 https://www.cnblogs.com/hlkawa/p/7352678.html
 

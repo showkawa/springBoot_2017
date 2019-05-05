@@ -10,8 +10,11 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 
 @Service
@@ -29,6 +32,9 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public Integer insertUser(User user) {
+		user.setPassword("10086");
+		user.setCreated(new Date());
+		user.setUpdated(user.getCreated());
 		return userDao.addUser(user);
 	}
 

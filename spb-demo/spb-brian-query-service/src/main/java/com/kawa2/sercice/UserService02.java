@@ -7,8 +7,8 @@ import java.util.Map;
 
 public interface UserService02 {
 	List<User> queryUserList(Map<String, Object> params);
-	/*Integer insertUser(User user);
-	Boolean updateUser(User user);
+	Integer insertUser(User user);
+	/*Boolean updateUser(User user);
 	Integer deleteUserById(Long id);
 	User queryUserById(Long id);*/
 }

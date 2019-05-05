@@ -8,22 +8,40 @@
 #    driver-class-name: com.mysql.cj.jdbc.Driver
 
 #多数据源配置
-spring:
+#spring:
+mysql:
   datasource:
     kawa: #数据源1
      # url: jdbc:mysql://o186928x99.imwork.net:12921/brian?useUnicode=true&characterEncoding=utf-8&useSSL=false
       jdbc-url: jdbc:mysql://xuduocloud.qicp.vip:14110/brian?useUnicode=true&characterEncoding=utf-8&useSSL=false
       username: root
-      password: 123456
+      password: XXXXX
       driver-class-name: com.mysql.cj.jdbc.Driver
+      minPoolSize: 3
+      maxPoolSize: 25
+      maxLifetime: 20000
+      borrowConnectionTimeout: 30
+      loginTimeout: 30
+      maintenanceInterval: 60
+      maxIdleTime: 60
     kawa02: #数据源2
-      jdbc-url: jdbc:mysql://remotemysql.com:3306/khgvUiO4eh?useUnicode=true&characterEncoding=utf-8&useSSL=false
-      username: khgvUiO4eh
-      password: BGAAee478r
+#      jdbc-url: jdbc:mysql://remotemysql.com:3306/khgvUiO4eh?useUnicode=true&characterEncoding=utf-8&useSSL=false
+#      username: khgvUiO4eh
+#      password: BGAAee478r
+      jdbc-url: jdbc:mysql://xuduocloud.qicp.vip:14110/brian02?useUnicode=true&characterEncoding=utf-8&useSSL=false
+      username: root
+      password: XXXXX
       driver-class-name: com.mysql.cj.jdbc.Driver
+      minPoolSize: 3
+      maxPoolSize: 25
+      maxLifetime: 20000
+      borrowConnectionTimeout: 30
+      loginTimeout: 30
+      maintenanceInterval: 60
+      maxIdleTime: 60
 
 
-
+spring:
 #配置redis数据库
   redis:
     host: 10.0.75.1
@@ -51,15 +69,6 @@ spring:
 #服务名
   application:
     name: brian-query-service
-
-
-
-#指定bean所在包
-#mybatis:
- # type-aliases-package: com.kawa.pojo
-#指定映射文件
-  #mapper-locations: classpath:mapper/*.xml
-
 
 #eureka主机名，会在控制页面中显示
 eureka:

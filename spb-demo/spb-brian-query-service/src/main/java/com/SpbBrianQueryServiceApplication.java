@@ -1,7 +1,10 @@
 package com;
 
+import com.config.DbConfig;
+import com.config.DbConfig02;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 /**
  * @EnableEurekaClient
@@ -15,6 +18,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  */
 @SpringBootApplication
 //@EnableEurekaClient
+@EnableConfigurationProperties({DbConfig.class, DbConfig02.class})
 public class SpbBrianQueryServiceApplication {
 
     public static void main(String[] args) {

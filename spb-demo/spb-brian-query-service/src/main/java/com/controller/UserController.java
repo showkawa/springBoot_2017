@@ -49,6 +49,13 @@ public class UserController {
 		return new ResponseEntity<>(queryAllUsers, HttpStatus.OK);
 	}
 
+
+    @PostMapping(path = "/multiTransactionalTest")
+    public ResponseEntity multiTransactionalTest(@RequestBody User user) {
+        userService02.insert2Multi(user);
+        return new ResponseEntity(user, HttpStatus.OK);
+    }
+
 	@RequestMapping(path = "/getAll", method = RequestMethod.POST)
 	public ResponseEntity<UserQueryList> queryUsers(HttpServletRequest request, @RequestBody UserQuery userQuery) {
 		if (userQuery.getPage() == null) {

@@ -12,6 +12,8 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import javax.transaction.Transactional;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -19,8 +21,11 @@ import java.util.Map;
 @Service
 public class UserServiceImpl02 implements UserService02 {
 	
-	@Autowired
+	@Resource
 	UserDao02 userDao02;
+
+	@Resource
+	UserDao userDao;
 
 
 	@Override
@@ -28,12 +33,32 @@ public class UserServiceImpl02 implements UserService02 {
 		return userDao02.queryUserList(params);
 	}
 
-	/*@Override
+	@Override
 	public Integer insertUser(User user) {
+		user.setPassword("10086");
+		user.setCreated(new Date());
+		user.setUpdated(user.getCreated());
 		return userDao02.addUser(user);
 	}
 
-	@CachePut(value = "user",key = "#result.id")
+
+	/**
+	 * 多数据源的事务测试
+	 * @param user
+	 * @return
+	 */
+	@Transactional()
+	public Integer insert2Multi(User user) {
+		user.setPassword("10086");
+		user.setCreated(new Date());
+		user.setUpdated(user.getCreated());
+		Integer res = userDao.addUser(user);
+		Integer res2 = userDao02.addUser(user);
+		int err = 1 / 0;
+		return res+ res2;
+	}
+
+	/*@CachePut(value = "user",key = "#result.id")
 	@Override
 	public Boolean updateUser(User user) {
 		return userDao02.updateUser(user);
