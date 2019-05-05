@@ -1,8 +1,7 @@
-package com.kawa;
+package com;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 
 /**
  * @EnableEurekaClient
@@ -15,7 +14,7 @@ import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
  * 2. spring-cloud-starter-netflix-eureka-server依赖修改为spring-cloud-starter-netflix-eureka-client。
  */
 @SpringBootApplication
-@EnableEurekaClient
+//@EnableEurekaClient
 public class SpbBrianQueryServiceApplication {
 
     public static void main(String[] args) {

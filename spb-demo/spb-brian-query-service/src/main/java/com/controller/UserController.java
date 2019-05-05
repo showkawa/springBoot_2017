@@ -1,4 +1,4 @@
-package com.kawa.controller;
+package com.controller;
 
 import com.github.pagehelper.PageInfo;
 import com.kawa.job.AsyncService;
@@ -7,6 +7,9 @@ import com.kawa.pojo.UserQuery;
 import com.kawa.pojo.UserQueryList;
 import com.kawa.sercice.BrianService;
 import com.kawa.sercice.UserService;
+import com.kawa.sercice.impl.UserServiceImpl;
+import com.kawa2.sercice.UserService02;
+import com.kawa2.sercice.impl.UserServiceImpl02;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +30,10 @@ import java.util.concurrent.ExecutionException;
 public class UserController {
 
 	@Autowired
-	UserService userService;
+	UserServiceImpl userService;
+
+	@Autowired
+	UserServiceImpl02 userService02;
 
 	@Autowired
 	AsyncService asyncService;
@@ -35,6 +41,13 @@ public class UserController {
 	@Autowired
 	BrianService brianService;
 
+
+
+	@GetMapping(path = "/getAll")
+	public ResponseEntity<List<User>> queryUsers() {
+		List<User> queryAllUsers = userService02.queryUserList(null);
+		return new ResponseEntity<>(queryAllUsers, HttpStatus.OK);
+	}
 
 	@RequestMapping(path = "/getAll", method = RequestMethod.POST)
 	public ResponseEntity<UserQueryList> queryUsers(HttpServletRequest request, @RequestBody UserQuery userQuery) {
@@ -58,7 +71,7 @@ public class UserController {
 		queryList.setTotlePage(pageInfo.getPages());
 		Integer total = new Long(pageInfo.getTotal()).intValue();
 		queryList.setTotleRecords(total);
-		return new ResponseEntity<UserQueryList>(queryList, HttpStatus.OK);
+		return new ResponseEntity<>(queryList, HttpStatus.OK);
 	}
 
 

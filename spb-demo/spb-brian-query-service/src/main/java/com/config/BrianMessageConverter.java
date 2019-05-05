@@ -1,4 +1,4 @@
-package com.kawa.config;
+package com.config;
 
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;

@@ -1,6 +1,5 @@
 package com.kawa.mq;
-
-import com.kawa.config.Contents;
+import com.config.Contents;
 import org.springframework.amqp.core.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

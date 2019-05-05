@@ -1,4 +1,4 @@
-package com.kawa.config;
+package com.config;
 
 
 /**
