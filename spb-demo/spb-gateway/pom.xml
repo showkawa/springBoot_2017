@@ -4,11 +4,11 @@
   <parent>
     <groupId>com.kawa</groupId>
     <artifactId>spb-demo</artifactId>
-    <version>0.0.3</version>
+    <version>0.0.4</version>
   </parent>
   <groupId>com.kawa</groupId>
   <artifactId>spb-gateway</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.0.2</version>
   <name>spb-gateway</name>
   <description>brian-gateway</description>
 
@@ -21,6 +21,11 @@
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
       <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 

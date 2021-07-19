@@ -1,10 +1,11 @@
 package com.kawa.javaJVM;
 
+
 import org.junit.Ignore;
 
 public class Test {
 
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     @Ignore
     public void testGC(){
             Test t = new Test();

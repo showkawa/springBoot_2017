@@ -5,7 +5,7 @@ import com.kawa.javaDesign23.装饰着模式.coffee.LongBlack;
 import com.kawa.javaDesign23.装饰着模式.decorator.Chocolate;
 import com.kawa.javaDesign23.装饰着模式.decorator.Milk;
 import com.kawa.javaDesign23.装饰着模式.decorator.Soy;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestDrink {
 

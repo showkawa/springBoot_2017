@@ -1,7 +1,7 @@
 package com.kawa.javaDesign23.适配器模式;
 
 import com.kawa.javaDesign23.适配器模式.turkey.WildTurkey;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestAdapter {
 

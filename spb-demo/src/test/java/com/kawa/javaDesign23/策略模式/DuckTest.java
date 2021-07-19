@@ -1,6 +1,7 @@
 package com.kawa.javaDesign23.策略模式;
 
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 
 public class DuckTest {
 

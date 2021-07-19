@@ -3,7 +3,7 @@ package com.kawa.javaDesign23.命令模式;
 import com.kawa.javaDesign23.命令模式.command.*;
 import com.kawa.javaDesign23.命令模式.command.device.Light;
 import com.kawa.javaDesign23.命令模式.command.device.Stereo;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestCommand {
     @Test

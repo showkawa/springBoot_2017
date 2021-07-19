@@ -5,12 +5,12 @@
     <parent>
         <groupId>com.kawa</groupId>
         <artifactId>spb-demo</artifactId>
-        <version>0.0.3</version>
+        <version>0.0.4</version>
         <relativePath/>
     </parent>
     <groupId>com.kawa</groupId>
     <artifactId>spb-feign</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.2</version>
     <name>spb-feign</name>
     <description>spb-feign</description>
 

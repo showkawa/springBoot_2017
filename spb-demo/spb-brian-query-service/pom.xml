@@ -5,11 +5,11 @@
     <parent>
         <groupId>com.kawa</groupId>
         <artifactId>spb-demo</artifactId>
-        <version>0.0.3</version>
+        <version>0.0.4</version>
     </parent>
     <groupId>com.kawa</groupId>
     <artifactId>spb-brian-query-service</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.2</version>
     <name>spb-brian-query-service</name>
     <description>Brian 查询服务</description>
 
@@ -70,18 +70,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jta-atomikos</artifactId>
         </dependency>
-
-
         <!-- https://mvnrepository.com/artifact/com.lmax/disruptor -->
         <dependency>
             <groupId>com.lmax</groupId>
             <artifactId>disruptor</artifactId>
             <version>3.4.2</version>
-        </dependency>
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.16</version>
         </dependency>
     </dependencies>
 
