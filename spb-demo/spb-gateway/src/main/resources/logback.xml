@@ -4,7 +4,16 @@
     <property name="CATALINA_BASE" value="/home/un/app/logs/gateway"></property>
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder charset="UTF-8">
-            <pattern>%-5level [%thread] %d{yyyy-MM-dd HH:mm:ss.SSS} %logger{36} - %msg%n</pattern>
+            <pattern>
+                {
+                    id: %X{gid},
+                    level: %-5level,
+                    thread: %thread,
+                    date: %d{yyyy-MM-dd HH:mm:ss.SSS},
+                    logger: %logger{36},
+                    msg: %msg
+                }%n
+            </pattern>
         </encoder>
     </appender>
     <appender name="BRIANHUANG" class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -20,10 +29,12 @@
         </encoder>
     </appender>
 
-    <root level="INFO">
-        <appender-ref ref="CONSOLE" />
-    </root>
-    <logger name="BrianGateway" level="ERROR">
+    <logger name="com..kawa.spbgateway" level="INFO" additivity="false">
         <appender-ref ref="BRIANHUANG" />
     </logger>
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="BRIANHUANG" />
+    </root>
+
 </configuration>
