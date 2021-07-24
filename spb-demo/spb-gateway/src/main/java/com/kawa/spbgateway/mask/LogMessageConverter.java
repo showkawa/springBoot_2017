@@ -1,10 +1,13 @@
 package com.kawa.spbgateway.mask;
 
+import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.pattern.MessageConverter;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
+
+import static com.kawa.spbgateway.content.Contents.DEFAULT_PATH;
 
 
 @Slf4j
@@ -17,8 +20,13 @@ public class LogMessageConverter extends MessageConverter {
     public String convert(ILoggingEvent event) {
         // 获取原始日志
         String requestLogMsg = event.getFormattedMessage();
-        // 获取返回脱敏后的日志
-        return filterSensitive(requestLogMsg);
+        String loggerName = event.getLoggerName();
+        if(loggerName.startsWith(DEFAULT_PATH)){
+            return filterSensitive(requestLogMsg);
+        }
+//        Level level = event.getLevel();
+//        Object[] argumentArrays = event.getArgumentArray();
+        return requestLogMsg;
     }
 
     /**

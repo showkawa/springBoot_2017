@@ -5,14 +5,15 @@
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder charset="UTF-8">
             <pattern>
-                {
-                    id: %X{gid},
-                    level: %-5level,
-                    thread: %thread,
-                    date: %d{yyyy-MM-dd HH:mm:ss.SSS},
-                    logger: %logger{36},
-                    msg: %msg
-                }%n
+<!--                {-->
+<!--                    id: %X{gid},-->
+<!--                    level: %-5level,-->
+<!--                    thread: %thread,-->
+<!--                    date: %d{yyyy-MM-dd HH:mm:ss.SSS},-->
+<!--                    logger: %logger{36},-->
+<!--                    msg: %msg-->
+<!--                }%n-->
+                %-5level %X{gid} [%thread] %d{yyyy-MM-dd HH:mm:ss.SSS} %logger{36} - %msg%n
             </pattern>
         </encoder>
     </appender>
@@ -32,7 +33,7 @@
     <logger name="com..kawa.spbgateway" level="INFO" additivity="false">
         <appender-ref ref="BRIANHUANG" />
     </logger>
-    <root level="INFO">
+    <root level="DEBUG">
         <appender-ref ref="CONSOLE" />
         <appender-ref ref="BRIANHUANG" />
     </root>
