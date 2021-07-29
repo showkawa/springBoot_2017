@@ -1,0 +1,4 @@
+routes:
+    uri: http://jsonplaceholder.typicode.com/
+    predicates:
+      - Path=/away/{segment},/blue/{segment}
