@@ -8,6 +8,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.UUID;
 
 
@@ -52,6 +53,20 @@ public class FileChannelTest {
             outputStr.flip();
             channel.write(outputStr);
         }
+    }
+
+    @Test
+    public void When_CopyFileByTransferFrom_Except_Success() throws IOException {
+        //create FileInputStream and FileOutputStream
+        try (var sourceStream = new FileInputStream("/home/un/code/springBoot_2017/spb-demo/spb-gateway/src/main/resources/core.yml");
+             var targetStream = new FileOutputStream("/home/un/app/test/text.txt")) {
+            // create the FileChannel
+            var sourceCh = sourceStream.getChannel();
+            var targetCh = targetStream.getChannel();
+            // use transferFrom transfer data to target FileChannel
+            targetCh.transferFrom(sourceCh,0 , sourceCh.size());
+        }
+
     }
 
 
