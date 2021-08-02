@@ -3,12 +3,11 @@ package com.kawa.spbgateway.service;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.nio.ByteBuffer;
+import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.Scanner;
 import java.util.UUID;
 
 
@@ -64,10 +63,33 @@ public class FileChannelTest {
             var sourceCh = sourceStream.getChannel();
             var targetCh = targetStream.getChannel();
             // use transferFrom transfer data to target FileChannel
-            targetCh.transferFrom(sourceCh,0 , sourceCh.size());
+            targetCh.transferFrom(sourceCh, 0, sourceCh.size());
         }
-
     }
 
+    @Test
+    public void When_ReadDataByMappedByteBuffer_Except_Success() throws IOException {
+        File file = new File("/home/un/code/springBoot_2017/spb-demo/spb-gateway/src/main/resources/core.yml");
+        long len = file.length();
+        byte[] ds = new byte[(int) len];
+
+        MappedByteBuffer mappedByteBuffer = new RandomAccessFile(file, "r")
+                .getChannel()
+                .map(FileChannel.MapMode.READ_ONLY, 0, len);
+        for (int offset = 0; offset < len; offset++) {
+            byte b = mappedByteBuffer.get();
+            ds[offset] = b;
+        }
+
+        Scanner scan = new Scanner(new ByteArrayInputStream(ds)).useDelimiter("\n");
+        while (scan.hasNext()) {
+            log.info("=== MappedByteBuffer ===: {}", scan.next());
+        }
+
+        // try to put
+        // java.nio.ReadOnlyBufferException
+        mappedByteBuffer.flip();
+        mappedByteBuffer.put("brian".getBytes());
+    }
 
 }
