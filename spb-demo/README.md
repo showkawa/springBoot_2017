@@ -43,11 +43,11 @@
 
 ### JAVA进阶(三) springcloud微服务
 
-#### 1. springCloud(一) 服务拆分 https://www.cnblogs.com/hlkawa/p/10166710.html
+#### 3. springcloud2(三) eureka服务治理及其原理 https://www.cnblogs.com/hlkawa/p/10987688.html
 
 #### 2. springCloud(二) 负载均衡器 https://www.cnblogs.com/hlkawa/p/10399121.html
 
-#### 3. springcloud2(三) eureka服务治理及其原理 https://www.cnblogs.com/hlkawa/p/10987688.html
+#### 1. springCloud(一) 服务拆分 https://www.cnblogs.com/hlkawa/p/10166710.html
 
 
 
