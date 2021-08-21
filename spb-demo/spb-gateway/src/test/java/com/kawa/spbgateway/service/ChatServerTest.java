@@ -61,8 +61,10 @@ public class ChatServerTest {
         try {
             int readLength = channel.read(buffer);
             if (readLength > 0) {
-                String msg = new String(buffer.array()).trim();
-                log.info("get msg from {} -> {}", channel.getRemoteAddress(), msg);
+                String msg = channel.getRemoteAddress() +" -> " +new String(buffer.array()).trim();
+
+
+                log.info("get msg from {}", msg);
                 // send msg to all client
                 sendToAllClient(channel, msg);
             }

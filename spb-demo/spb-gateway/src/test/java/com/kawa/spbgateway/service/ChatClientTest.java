@@ -50,7 +50,7 @@ public class ChatClientTest {
                         ByteBuffer buffer = ByteBuffer.allocate(1024);
                         channel.read(buffer);
                         String msg = new String(buffer.array()).trim();
-                        log.info("get mag from {} -> {}", channel.getRemoteAddress(), msg);
+                        log.info("get mag from {}", msg);
                     }
                     sks.remove();
                 }
