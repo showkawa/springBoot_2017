@@ -1,0 +1,6 @@
+routes:
+  - uri: http://jsonplaceholder.typicode.com/
+    predicates:
+      - Path=/api/passport-hk/v1/passport/query
+    evelvationType: ONE_FA
+    evalvation: [sms]

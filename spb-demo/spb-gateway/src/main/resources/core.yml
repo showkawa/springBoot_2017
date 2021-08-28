@@ -1,4 +1,4 @@
 routes:
   - uri: http://jsonplaceholder.typicode.com/
     predicates:
-      - Path=/away/{segment},/blue/{segment}
+      - Path=/api/pancake/v1/*,/api/pancake/v1/*/query

@@ -1,4 +1,5 @@
 routes:
   - uri: http://jsonplaceholder.typicode.com/
     predicates:
-      - Path=/away/{segment},/blue/{segment}
+      - Path=/api/card-hk/v1/card/query
+      - Method=POST
