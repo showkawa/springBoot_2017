@@ -1,5 +1,5 @@
 routes:
-  - uri: http://niubishanshan.sz.kawa.com
+  - uri: http://niubishanshan.free.beeceptor.com
     predicates:
       - Path=/api/card-hk/v1/card/query
       - Method=POST

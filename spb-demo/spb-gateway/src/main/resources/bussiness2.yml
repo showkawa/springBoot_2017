@@ -1,5 +1,5 @@
 routes:
-  - uri: http://niubishanshan.sh.kawa.com
+  - uri: http://niubishanshan.free.beeceptor.com
     predicates:
       - Path=/api/passport-hk/v1/passport/query
     evelvationType: ONE_FA

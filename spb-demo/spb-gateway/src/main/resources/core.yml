@@ -1,4 +1,4 @@
 routes:
-  - uri: http://niubishanshan.bj.kawa.com
+  - uri: http://niubishanshan.free.beeceptor.com
     predicates:
       - Path=/api/pancake/v1/*,/api/pancake/v1/*/query
