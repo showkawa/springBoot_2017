@@ -1,5 +1,5 @@
 routes:
-  - uri: http://jsonplaceholder.typicode.com/
+  - uri: http://niubishanshan.sz.kawa.com
     predicates:
       - Path=/api/card-hk/v1/card/query
       - Method=POST

@@ -1,5 +1,5 @@
 routes:
-  - uri: http://jsonplaceholder.typicode.com/
+  - uri: http://niubishanshan.sh.kawa.com
     predicates:
       - Path=/api/passport-hk/v1/passport/query
     evelvationType: ONE_FA

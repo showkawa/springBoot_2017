@@ -1,4 +1,4 @@
 routes:
-  - uri: http://jsonplaceholder.typicode.com/
+  - uri: http://niubishanshan.bj.kawa.com
     predicates:
       - Path=/api/pancake/v1/*,/api/pancake/v1/*/query
