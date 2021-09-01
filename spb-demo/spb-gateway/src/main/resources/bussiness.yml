@@ -1,5 +1,5 @@
 routes:
-  - uri: http://niubishanshan.free.beeceptor.com
+  - uri: http://card-hk.${gateway.route.domain.postfix}
     predicates:
-      - Path=/api/card-hk/v1/card/query
+      - Path=/api/hk/card/v1/card/query
       - Method=POST

@@ -1,4 +1,9 @@
 routes:
-  - uri: http://niubishanshan.free.beeceptor.com
+  - uri: http://pancake.${gateway.route.domain.postfix}
     predicates:
-      - Path=/api/pancake/v1/*,/api/pancake/v1/*/query
+      - Path=^/api/pancake/v1/*,^/api/pancake/v1/*/query
+
+  - predicates:
+      - Path=/api/pancake/v1/coin/query
+    filters:
+      - RewritePath=/api/pancake/v1/coin/query, /api/v1/coin/query

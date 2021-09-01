@@ -1,5 +1,5 @@
 routes:
-  - uri: http://niubishanshan.free.beeceptor.com
+  - uri: http://passport-hk/.${gateway.route.domain.postfix}
     predicates:
       - Path=/api/passport-hk/v1/passport/query
     evelvationType: ONE_FA
