@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -28,8 +27,6 @@ public class NacosRefreshRouteService implements ApplicationEventPublisherAware 
 
     @Autowired
     private RouteDefinitionLocator routeDefinitionLocator;
-
-    private List<String> routeIds = new ArrayList<>();
 
     @Override
     public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
