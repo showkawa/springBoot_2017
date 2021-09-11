@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @Service
 @Slf4j
-public class AutoRefreshEnvService implements EnvironmentAware {
+public class AutoRefreshApiKeyService implements EnvironmentAware {
 
     @Autowired
     private ContextRefresher contextRefresher;
