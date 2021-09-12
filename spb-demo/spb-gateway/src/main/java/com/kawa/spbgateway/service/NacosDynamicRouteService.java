@@ -7,12 +7,11 @@ import com.alibaba.nacos.api.exception.NacosException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kawa.spbgateway.route.CustomizedRouteDefinition;
+import com.kawa.spbgateway.route.BrianRouteDefinition;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.route.RouteDefinition;
 import org.springframework.context.annotation.DependsOn;
-import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
@@ -45,7 +44,7 @@ public class NacosDynamicRouteService {
         try {
             configInfo = configService.getConfig(NACOS_ROUTE_DATA_ID, NACOS_ROUTE_GROUP, DEFAULT_TIMEOUT);
             log.info(">>>>>>>>> get the gateway configInfo:\r\n{}", configInfo);
-            List<CustomizedRouteDefinition> routeDefinitions = objectMapper.readValue(configInfo, new TypeReference<List<CustomizedRouteDefinition>>() {
+            List<BrianRouteDefinition> routeDefinitions = objectMapper.readValue(configInfo, new TypeReference<List<BrianRouteDefinition>>() {
             });
 
             for (RouteDefinition definition : routeDefinitions) {
@@ -70,7 +69,7 @@ public class NacosDynamicRouteService {
                 @Override
                 public void receiveConfigInfo(String configInfo) {
                     log.info(">>>>>>>>> listened configInfo change:\n\t{}", configInfo);
-                    List<CustomizedRouteDefinition> routeDefinitions = null;
+                    List<BrianRouteDefinition> routeDefinitions = null;
                     try {
                         routeDefinitions = objectMapper.readValue(configInfo, new TypeReference<>() {
                         });

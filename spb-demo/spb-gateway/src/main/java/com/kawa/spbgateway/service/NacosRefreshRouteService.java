@@ -1,6 +1,6 @@
 package com.kawa.spbgateway.service;
 
-import com.kawa.spbgateway.route.CustomizedRouteDefinition;
+import com.kawa.spbgateway.route.BrianRouteDefinition;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.event.RefreshRoutesEvent;
@@ -9,7 +9,6 @@ import org.springframework.cloud.gateway.route.RouteDefinitionLocator;
 import org.springframework.cloud.gateway.route.RouteDefinitionWriter;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
-import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import reactor.core.publisher.Mono;
 
@@ -55,7 +54,7 @@ public class NacosRefreshRouteService implements ApplicationEventPublisherAware 
      * @param definitions
      * @return
      */
-    public void updateList(List<CustomizedRouteDefinition> definitions) {
+    public void updateList(List<BrianRouteDefinition> definitions) {
         log.info(">>>>>>>>>> gateway update route {}", definitions);
         // 删除缓存routerDefinition
         List<RouteDefinition> routeDefinitionsExits = routeDefinitionLocator.getRouteDefinitions().buffer().blockFirst();
