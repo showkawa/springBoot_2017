@@ -231,6 +231,7 @@ public class FileDynamicRouteService implements RouteDefinitionRepository {
 
     @Override
     public Flux<RouteDefinition> getRouteDefinitions() {
+        log.info(")))))))))))))))))))))))))))))) FileDynamicRouteService getRouteDefinitions～～～");
         return Flux.fromIterable(routes.values());
     }
 

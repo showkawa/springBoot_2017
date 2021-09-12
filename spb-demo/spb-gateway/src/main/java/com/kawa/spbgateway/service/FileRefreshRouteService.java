@@ -16,7 +16,7 @@ import java.io.IOException;
 public class FileRefreshRouteService implements ApplicationEventPublisherAware, CommandLineRunner {
 
     @Autowired
-    private FileDynamicRouteService refreshRoute;
+    private FileDynamicRouteService routeService;
 
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
@@ -34,7 +34,8 @@ public class FileRefreshRouteService implements ApplicationEventPublisherAware, 
     private synchronized void refreshRoute() {
         try {
             log.info(">>>>>>>>>> start refresh route <<<<<<<<<<");
-            if (refreshRoute.refreshRoutes()) {
+            if (routeService.refreshRoutes()) {
+                log.info(")))))))))))))))))))))))))))))) FileRefreshRouteService refreshRoute～～～");
                 applicationEventPublisher.publishEvent(new RefreshRoutesEvent(this));
             }
         } catch (IOException e) {

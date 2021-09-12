@@ -34,33 +34,33 @@ public class BrianRouteDefinitionTransformer {
 
     private ApiKeysConfiguration apiKeys;
 
-    public RouteDefinition transform(BrianRouteDefinition customizedRouteDefinition, String uri) {
+    public RouteDefinition transform(BrianRouteDefinition brianRouteDefinition, String uri) {
         // add ConfigGatewayFilter
         FilterDefinition configFilter = new FilterDefinition();
         configFilter.setName(CONFIG_GATEWAY_FILTER_CLASS_NAME);
         HashMap<String, String> configArgs = new HashMap<>();
 
-        var apiKeyString = customizedRouteDefinition.getApiKeys().stream().map(ak -> apiKeys.getValue(ak)).collect(Collectors.toList()).toString();
+        var apiKeyString = brianRouteDefinition.getApiKeys().stream().map(ak -> apiKeys.getValue(ak)).collect(Collectors.toList()).toString();
         configArgs.put(GATEWAY_CONFIG_CLASS_API_KEYS, apiKeyString.substring(1, apiKeyString.length() - 1));
 
         configArgs.put(GATEWAY_CONFIG_CLASS_AUTH, default1FAValues.toString());
-        if (Objects.nonNull(customizedRouteDefinition.getAuths()) &&
-                customizedRouteDefinition.getAuths().size() > 0) {
-            configArgs.put(GATEWAY_CONFIG_CLASS_AUTH, customizedRouteDefinition.getAuths().toString());
+        if (Objects.nonNull(brianRouteDefinition.getAuths()) &&
+                brianRouteDefinition.getAuths().size() > 0) {
+            configArgs.put(GATEWAY_CONFIG_CLASS_AUTH, brianRouteDefinition.getAuths().toString());
         }
         configFilter.setArgs(configArgs);
-        customizedRouteDefinition.getFilters().add(configFilter);
+        brianRouteDefinition.getFilters().add(configFilter);
 
         if (StringUtils.hasText(uri)) {
-            customizedRouteDefinition.setUri(URI.create(uri));
+            brianRouteDefinition.setUri(URI.create(uri));
             // set route id
-            setRouteId(customizedRouteDefinition);
+            setRouteId(brianRouteDefinition);
         }
-        long count = customizedRouteDefinition.getFilters().stream()
+        long count = brianRouteDefinition.getFilters().stream()
                 .filter(filterDefinition -> filterDefinition.getName().equals(REWRITE_GATEWAY_FILTER_CLASS_NAME))
                 .count();
         // get path value from Prediction config
-        var path = getPathString(customizedRouteDefinition);
+        var path = getPathString(brianRouteDefinition);
         log.info(">>>>>>>>>> route path: {}", path);
         var replacement = defaultRewriteDomainReplacement.replace("$\\", "$");
         Pattern pattern = Pattern.compile(defaultRewriteDomainRegexp);
@@ -68,16 +68,16 @@ public class BrianRouteDefinitionTransformer {
         if (defaultMatcher.matches()) {
             String newDomain = defaultMatcher.replaceAll(replacement);
             log.info(">>>>>>>>>>  redefine the path {{}} and new domain {{}}", path, newDomain);
-            if (Objects.isNull(customizedRouteDefinition.getUri())) {
-                customizedRouteDefinition.setUri(URI.create(newDomain));
+            if (Objects.isNull(brianRouteDefinition.getUri())) {
+                brianRouteDefinition.setUri(URI.create(newDomain));
                 // set route id
-                setRouteId(customizedRouteDefinition);
+                setRouteId(brianRouteDefinition);
             }
             // add RewritePathGatewayFilter
             if (count < 1L) {
-                addRewriteFilter(customizedRouteDefinition, defaultRewritePathRegexp, defaultRewritePathReplacement);
+                addRewriteFilter(brianRouteDefinition, defaultRewritePathRegexp, defaultRewritePathReplacement);
             }
-            return customizedRouteDefinition;
+            return brianRouteDefinition;
         }
 
         var replacementExt = extendRewriteDomainReplacement.replace("$\\", "$");
@@ -85,23 +85,23 @@ public class BrianRouteDefinitionTransformer {
         Matcher defaultExtMatcher = patternExt.matcher(path);
         if (defaultExtMatcher.matches()) {
             String newDomain = defaultExtMatcher.replaceAll(replacementExt);
-            if (Objects.isNull(customizedRouteDefinition.getUri())) {
-                customizedRouteDefinition.setUri(URI.create(newDomain));
+            if (Objects.isNull(brianRouteDefinition.getUri())) {
+                brianRouteDefinition.setUri(URI.create(newDomain));
                 // set route id
-                setRouteId(customizedRouteDefinition);
+                setRouteId(brianRouteDefinition);
             }
             // add RewritePathGatewayFilter
             if (count < 1L) {
-                addRewriteFilter(customizedRouteDefinition, extendRewritePathRegexp, extendRewritePathReplacement);
+                addRewriteFilter(brianRouteDefinition, extendRewritePathRegexp, extendRewritePathReplacement);
             }
-            return customizedRouteDefinition;
+            return brianRouteDefinition;
         }
-        if (Objects.isNull(customizedRouteDefinition.getUri())) {
-            customizedRouteDefinition.setUri(URI.create(FALL_BACK_URI + path));
+        if (Objects.isNull(brianRouteDefinition.getUri())) {
+            brianRouteDefinition.setUri(URI.create(FALL_BACK_URI + path));
             // set route id
-            setRouteId(customizedRouteDefinition);
+            setRouteId(brianRouteDefinition);
         }
-        return customizedRouteDefinition;
+        return brianRouteDefinition;
     }
 
     private void setRouteId(BrianRouteDefinition customizedRouteDefinition) {

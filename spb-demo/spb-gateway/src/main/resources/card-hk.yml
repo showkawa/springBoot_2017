@@ -1,7 +1,7 @@
 routes:
   - uri: http://card-hk.${gateway.route.domain.postfix}
     predicates:
-      - Path=/api/hk/card/v1/uuu/query
+      - Path=/api/hk/card/v1/card/query
       - Method=POST
 #  - uri: http://card-hk.${gateway.route.domain.postfix}
 #    predicates:
