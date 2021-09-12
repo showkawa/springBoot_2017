@@ -31,7 +31,7 @@ public class ApiKeysConfiguration implements EnvironmentAware {
         return (String) apiKey.get(key);
     }
 
-    @Scheduled(cron = "0/10 * * * * ?")
+    @Scheduled(cron = "0 */5 * * * ?")
     private void autoRefresh() {
         log.info(">>>>>>>>>> auto refresh apikey <<<<<<<<<<");
         randomChangeBean();
@@ -42,13 +42,12 @@ public class ApiKeysConfiguration implements EnvironmentAware {
         if (environment instanceof ConfigurableEnvironment) {
             environment = (ConfigurableEnvironment) environment;
             MutablePropertySources propertySources = ((ConfigurableEnvironment) environment).getPropertySources();
-            propertySources.remove("apikey");
             apiKey.keySet().forEach(key -> {
                 String newVal = UUID.randomUUID().toString().replace("-", "");
+                log.info(">>>>>>>>>>> key:{}, value:{ oldValue:{}, newValue:{} }", key, apiKey.get(key), newVal);
                 apiKey.put(key, newVal);
-                log.info(">>>>>>>>>>> apikey:{ key:{}, value:{ oldValue:{}, newValue:{} } }", key, apiKey.get(key), newVal);
             });
-            propertySources.addFirst(new MapPropertySource("apikey", apiKey));
+            propertySources.addLast(new MapPropertySource("apikey", apiKey));
         }
     }
 
