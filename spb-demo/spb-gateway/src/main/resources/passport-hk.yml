@@ -1,0 +1,6 @@
+routes:
+  - uri: http://passport-hk.${gateway.route.domain.postfix}
+    predicates:
+      - Path=/api/passport-hk/v1/passport/query
+    auths:
+      - sms
