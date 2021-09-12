@@ -1,5 +1,7 @@
 ### JAVA 进阶(一)  Springboot(源码分析和高级用法)
 
+#### 13.springboot 常用的接口，工具类，注解汇总 https://www.cnblogs.com/hlkawa/p/14099755.html
+
 #### 12.springBoot 性能优化  https://www.cnblogs.com/hlkawa/p/10813642.html
 
 #### 11.springboot 任务  https://www.cnblogs.com/hlkawa/p/9792717.html
@@ -42,6 +44,10 @@
 ***
 
 ### JAVA进阶(三) springcloud微服务
+
+#### 5. springcloud3(五) spring cloud gateway动态路由的四类实现方式 https://www.cnblogs.com/hlkawa/p/14931961.html
+
+#### 4. springcloud2 (四) Eureka项目里面常用的API https://www.cnblogs.com/hlkawa/p/12640879.html
 
 #### 3. springcloud2(三) eureka服务治理及其原理 https://www.cnblogs.com/hlkawa/p/10987688.html
 
