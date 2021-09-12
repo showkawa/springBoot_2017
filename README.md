@@ -45,6 +45,10 @@
 
 ### JAVA进阶(三) springcloud微服务
 
+#### 5. springcloud3(五) spring cloud gateway动态路由的四类实现方式 https://www.cnblogs.com/hlkawa/p/14931961.html
+
+#### 4. springcloud2 (四) Eureka项目里面常用的API https://www.cnblogs.com/hlkawa/p/12640879.html
+
 #### 3. springcloud2(三) eureka服务治理及其原理 https://www.cnblogs.com/hlkawa/p/10987688.html
 
 #### 2. springCloud(二) 负载均衡器 https://www.cnblogs.com/hlkawa/p/10399121.html
