@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
-@Service
+//@Service
 public class RedisDynamicRouteService {
 
     public static final String GATEWAY_ROUTES_PREFIX = "brian:sz_home:gateway_dynamic_route:";

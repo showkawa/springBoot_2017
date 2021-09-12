@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono;
 
 
 @Slf4j
-@Service
+//@Service
 public class RedisRefreshRouteService implements ApplicationEventPublisherAware, ApplicationRunner {
 
     @Autowired

@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 
 
-@Service
+//@Service
 @Slf4j
 public class NacosRefreshRouteService implements ApplicationEventPublisherAware {
 

@@ -21,7 +21,7 @@ import java.util.concurrent.Executor;
 
 import static com.kawa.spbgateway.config.NacosGatewayConfig.*;
 
-@Service
+//@Service
 @Slf4j
 @DependsOn({"nacosGatewayConfig"})
 public class NacosDynamicRouteService {
