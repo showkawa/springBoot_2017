@@ -19,7 +19,7 @@ import java.time.ZoneId;
 @Slf4j
 public class CheckSumUtilTest {
 
-    String filePath = "/home/un/code/springBoot_2017/spb-demo/spb-gateway/src/main/resources/core.yml";
+    String filePath = "/home/un/code/springBoot_2017/spb-demo/spb-gateway/src/main/resources/pancake.yml";
 
 
     @Test

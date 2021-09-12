@@ -17,7 +17,7 @@ public class FileChannelTest {
     @Test
     public void When_GetDataFromFileChannel_Except_Success() throws IOException {
         //create the file input stream
-        var file = new File("/home/un/code/springBoot_2017/spb-demo/spb-gateway/src/main/resources/core.yml");
+        var file = new File("/home/un/code/springBoot_2017/spb-demo/spb-gateway/src/main/resources/pancake.yml");
         try (var fileInputStream = new FileInputStream(file)) {
             // get the FileChannel (FileChannelImpl) by FileInputStream
             var fileChannel = fileInputStream.getChannel();
@@ -25,14 +25,14 @@ public class FileChannelTest {
             var byteBuffer = ByteBuffer.allocate((int) file.length());
             // read the channel data to buffer
             fileChannel.read(byteBuffer);
-            log.info("=== core.yml ===: \r\n{}", new String(byteBuffer.array()));
+            log.info("=== pancake.yml ===: \r\n{}", new String(byteBuffer.array()));
         }
     }
 
     @Test
     public void When_OutputData_Except_Success() throws IOException {
         //create the file input stream
-        var file = new File("/home/un/code/springBoot_2017/spb-demo/spb-gateway/src/main/resources/core.yml");
+        var file = new File("/home/un/code/springBoot_2017/spb-demo/spb-gateway/src/main/resources/pancake.yml");
         ByteBuffer outputStr;
 
         try (var fileInputStream = new FileInputStream(file)) {
@@ -57,7 +57,7 @@ public class FileChannelTest {
     @Test
     public void When_CopyFileByTransferFrom_Except_Success() throws IOException {
         //create FileInputStream and FileOutputStream
-        try (var sourceStream = new FileInputStream("/home/un/code/springBoot_2017/spb-demo/spb-gateway/src/main/resources/core.yml");
+        try (var sourceStream = new FileInputStream("/home/un/code/springBoot_2017/spb-demo/spb-gateway/src/main/resources/pancake.yml");
              var targetStream = new FileOutputStream("/home/un/app/test/text.txt")) {
             // create the FileChannel
             var sourceCh = sourceStream.getChannel();
@@ -69,7 +69,7 @@ public class FileChannelTest {
 
     @Test
     public void When_ReadDataByMappedByteBuffer_Except_Success() throws IOException {
-        File file = new File("/home/un/code/springBoot_2017/spb-demo/spb-gateway/src/main/resources/core.yml");
+        File file = new File("/home/un/code/springBoot_2017/spb-demo/spb-gateway/src/main/resources/pancake.yml");
         long len = file.length();
         byte[] ds = new byte[(int) len];
 
