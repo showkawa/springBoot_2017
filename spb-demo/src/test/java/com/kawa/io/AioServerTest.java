@@ -1,4 +1,4 @@
-package com.kawa.spbgateway.service;
+package com.kawa.io;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;

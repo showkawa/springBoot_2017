@@ -1,4 +1,4 @@
-package com.kawa.spbgateway.service;
+package com.kawa.io;
 
 import org.junit.Test;
 
