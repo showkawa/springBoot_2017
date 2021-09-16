@@ -16,7 +16,6 @@
 		<module>spb-brian-query-service</module>
 		<module>spb-brian-query-service2</module>
 		<module>spb-feign</module>
-		<module>spb-zuul</module>
 		<module>spb-mq</module>
 		<module>spb-gateway</module>
 	</modules>
