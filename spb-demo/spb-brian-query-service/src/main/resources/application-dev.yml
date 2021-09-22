@@ -46,7 +46,6 @@ spring:
   redis:
     host: 10.0.75.1
 #配置rabbitMQ
-
   rabbitmq:
     host: 10.0.75.1
     port: 5672
@@ -55,6 +54,11 @@ spring:
     virtual-host: /
     #值为true可实现消息确认
     publisher-confirms: true
+#配置r2dbc + postgresql
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/postgres?schema=public
+    username: postgres
+    password: Chen@2019
    #配置邮件
   mail:
     username: 1092249319@qq.com
