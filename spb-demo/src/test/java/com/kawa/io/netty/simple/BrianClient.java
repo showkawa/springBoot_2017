@@ -25,9 +25,9 @@ public class BrianClient {
                             ch.pipeline().addLast(new BrianClientHandler());
                         }
                     });
-            log.info("---------- BrianClient is ready  ----------");
             // start the client and listen the server port 9001
             ChannelFuture channelFuture = bootstrap.connect("127.0.0.1", 9001).sync();
+            log.info("---------- BrianClient is ready  ----------");
             // listen the close channel
             channelFuture.channel().closeFuture().sync();
 
