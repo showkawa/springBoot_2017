@@ -1,7 +1,7 @@
 package com.kawa.mutilthread.forkjoin.controller;
 
 
-import com.brian.mutilthread.forkjoin.service.AutomationTask;
+import com.kawa.mutilthread.forkjoin.service.AutomationTask;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StopWatch;
