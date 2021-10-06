@@ -5,8 +5,15 @@ import javassist.*;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
+import java.io.IOException;
+import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 @Slf4j
 public class BrianssistTest {
+
+    private ClassPool classPool = ClassPool.getDefault();
 
     /**
      * ClassPool.get()
@@ -14,7 +21,6 @@ public class BrianssistTest {
      */
     @Test
     public void Javassist_ClassPool_GetClass() {
-        ClassPool classPool = ClassPool.getDefault();
         try {
             // Get CtClass, will throw NotFoundException when not found
             CtClass cc = classPool.get("com.kawa.ssist.JustRun");
@@ -43,5 +49,31 @@ public class BrianssistTest {
             e.printStackTrace();
         }
     }
+
+    /**
+     *
+     * ClassPool.makeClass()
+     * ClassPool.getAndRename()
+     */
+    @Test
+    public void Javassist_ClassPool_CreateClass() {
+        CtClass ctClass = classPool.makeClass("com.kawa.ssist.JustRuns");
+        try {
+            CtConstructor nc = new CtConstructor(null, ctClass);
+            nc.setBody("{System.out.println(\">>>>>>>>>> CtConstructor \" + this.getClass().getName());}");
+            ctClass.addConstructor(nc);
+            Class<?> aClass = ctClass.toClass();
+            ctClass.writeFile("/home/un/app/test/");
+            log.info("----- create and rename class -----");
+            CtClass class2 = classPool.getAndRename("com.kawa.ssist.JustRun", "com.kawa.ssist.JustRuna");
+            for (CtConstructor constructor : class2.getConstructors()) {
+                log.info(">>>>>>>>>>>>>>>>>: {}",constructor);
+            }
+        } catch (CannotCompileException | IOException | NotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 
 }
