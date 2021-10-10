@@ -1,9 +1,18 @@
 package com.kawa.ssist;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
 
 @Slf4j
 public class JustRun {
+
+    private String name;
+
+    public JustRun() {
+        if (StringUtils.hasText(name)) {
+            this.name = this.getClass().getSimpleName();
+        }
+    }
 
     public String returnPublicStr(String name) {
         log.info(">>>>>>>>>>> name: {}", name);
