@@ -27,7 +27,7 @@ public class BrianssistTest {
             CtMethod declaredMethod = cc.getDeclaredMethod("returnPublicStr");
             declaredMethod.insertAfter("log.info(\">>>>>>>>>> com.kawa.ssist.JustRun - returnPublicStr - end\");");
             Class<JustRun> cdlt = (Class<JustRun>) cc.toClass();
-            JustRun justRun = cdlt.getDeclaredConstructor(null).newInstance();
+            JustRun justRun = cdlt.getDeclaredConstructor(new Class[]{}).newInstance();
             justRun.returnPublicStr("kawa");
         } catch (NotFoundException | CannotCompileException | InstantiationException |
                 IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
@@ -41,7 +41,7 @@ public class BrianssistTest {
                 CtMethod declaredMethod = cc.getDeclaredMethod("returnPublicStr");
                 declaredMethod.insertAfter("log.info(\">>>>>>>>>> com.kawa.ssist.JustRun - returnPublicStr - end\");");
                 Class<JustRun> cdlt = (Class<JustRun>) cc.toClass();
-                JustRun justRun = cdlt.getDeclaredConstructor(null).newInstance();
+                JustRun justRun = cdlt.getDeclaredConstructor(new Class[]{}).newInstance();
                 justRun.returnPublicStr("kawa");
             } else {
                 log.info(">>>>>>>>>> can not found class: com.kawa.ssist.JustRunq");
@@ -75,16 +75,6 @@ public class BrianssistTest {
         }
     }
 
-    /**
-     * ClassPool.insertClassPath()
-     * ClassPool.appendClassPath()
-     * 通过 ClassPool.getDefault()获取的ClassPool使用JVM的classpath.
-     * 在Tomcat等Web服务器运行时, 服务器会使用多个类加载器作为系统类加载器, 这可能导致ClassPool可能无法找到用户的类.
-     * 这时, ClassPool须添加额外的classpath才能搜索到用户的类.
-     */
-    @Test
-    public void Javassist_ClassPool_Classpath() {}
-
     @Test
     public void Javassist_ClassPool_GetMethod() {
         try {
@@ -103,6 +93,8 @@ public class BrianssistTest {
             log.info(">>>>>>>>>>>>>>>>> isKotlin(): {}", cc.isKotlin());
             log.info(">>>>>>>>>>>>>>>>> isArray(): {}", cc.isArray());
             log.info(">>>>>>>>>>>>>>>>> isEnum(): {}", cc.isEnum());
+            log.info(">>>>>>>>>>>>>>>>> isFrozen(): {}", cc.isFrozen());
+            cc.freeze();
             log.info(">>>>>>>>>>>>>>>>> isFrozen(): {}", cc.isFrozen());
         } catch (NotFoundException e) {
             e.printStackTrace();
