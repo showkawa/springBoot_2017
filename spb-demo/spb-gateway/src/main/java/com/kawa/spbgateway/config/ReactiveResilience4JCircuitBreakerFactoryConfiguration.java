@@ -8,9 +8,11 @@ import io.github.resilience4j.timelimiter.TimeLimiterRegistry;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.cloud.circuitbreaker.resilience4j.ReactiveResilience4JCircuitBreakerFactory;
 import org.springframework.cloud.client.circuitbreaker.ReactiveCircuitBreakerFactory;
+import org.springframework.cloud.gateway.support.TimeoutException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.io.IOException;
 import java.time.Duration;
 
 @Configuration
@@ -27,9 +29,9 @@ public class ReactiveResilience4JCircuitBreakerFactoryConfiguration {
     public CircuitBreakerRegistry circuitBreakerRegistry() {
         CircuitBreakerConfig circuitBreakerConfig = CircuitBreakerConfig.custom().failureRateThreshold(5)
                 .waitDurationInOpenState(Duration.ofMillis(100))
-                .permittedNumberOfCallsInHalfOpenState(20)
-                .slidingWindowSize(10)
-//                .recordExceptions(IOException.class, TimeoutException.class)
+                .permittedNumberOfCallsInHalfOpenState(2)
+                .slidingWindowSize(5)
+                .recordExceptions(IOException.class, TimeoutException.class)
                 .build();
         CircuitBreakerRegistry breakerRegistry = CircuitBreakerRegistry.of(circuitBreakerConfig);
         return breakerRegistry;

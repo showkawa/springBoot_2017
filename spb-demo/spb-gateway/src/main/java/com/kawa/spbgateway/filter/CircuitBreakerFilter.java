@@ -46,8 +46,8 @@ public class CircuitBreakerFilter implements GlobalFilter, Ordered {
 
     private Set<String> defaultStatusCodes = new HashSet<>(Arrays.asList("400", "401", "500"));
 
-//    private URI defaultFallbackUri = URI.create("http://localhost:8080/api/passport-hk/v1/passport/query");
-    private URI defaultFallbackUri = URI.create("http://xxxxxxxxxx");
+//    private URI defaultFallbackUri = URI.create("http://localhost:8080");
+    private URI defaultFallbackUri = null;
 
     public CircuitBreakerFilter() {
     }
