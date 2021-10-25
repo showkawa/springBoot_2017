@@ -45,7 +45,6 @@ public class ReactiveResilience4JCircuitBreakerFactoryConfiguration {
                 .cancelRunningFuture(true)
                 .timeoutDuration(Duration.ofMillis(500))
                 .build();
-
         // Create a TimeLimiterRegistry with a custom global configuration
         TimeLimiterRegistry timeLimiterRegistry = TimeLimiterRegistry.of(config);
         return timeLimiterRegistry;
