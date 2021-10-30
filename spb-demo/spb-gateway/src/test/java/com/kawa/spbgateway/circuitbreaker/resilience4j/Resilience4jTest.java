@@ -5,6 +5,7 @@ import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import io.github.resilience4j.bulkhead.Bulkhead;
 import io.github.resilience4j.bulkhead.BulkheadConfig;
 import io.github.resilience4j.bulkhead.BulkheadRegistry;
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
@@ -18,6 +19,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.cloud.gateway.support.TimeoutException;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.netty.http.client.HttpClient;
 
@@ -27,8 +29,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
+import static com.kawa.spbgateway.circuitbreaker.resilience4j.Resilience4jTestHelper.weightBoolean;
 
 @Slf4j
+@TestPropertySource(properties = {
+        "logging.config=./src/test/resources/logback.xml"
+})
 public class Resilience4jTest {
 
     @Rule
@@ -131,8 +137,11 @@ public class Resilience4jTest {
 
     }
 
+    /**
+     * use executeCheckedSupplier or executeSupplier no need use degradation
+     */
     @Test
-    public void circuitBreakerTest() {
+    public void When_CircuitBreaker_Expect_Open() {
         AtomicInteger count = new AtomicInteger();
         try {
             for (int i = 0; i < 10; i++) {
@@ -152,7 +161,27 @@ public class Resilience4jTest {
         } catch (Throwable error) {
             log.error(String.format(">>>>>>>>>> %s", error.getMessage()));
         }
+    }
 
+    @Test
+    public void When_CircuitBreaker_Expect_Fallback() {
+        AtomicInteger count = new AtomicInteger();
+        for (int i = 0; i < 100; i++) {
+            String path = weightBoolean() ? PATH_500 : PATH_200;
+            CheckedFunction0<String> response =
+                    circuitBreaker.decorateCheckedSupplier(() -> Resilience4jTestHelper.responseToCircuitBreaker(circuitBreaker, testClient, path));
+            Try<String> result = Try.of(response).recover(CallNotPermittedException.class, throwable -> {
+                Resilience4jTestHelper.getCircuitBreakerStatus(">>>>>>>>>> open CircuitBreaker " + count.incrementAndGet(), circuitBreaker);
+                return "hit CircuitBreaker";
+            }).recover(throwable -> {
+                Resilience4jTestHelper.getCircuitBreakerStatus(">>>>>>>>>> call fallback " + count.incrementAndGet(), circuitBreaker);
+                return "hit fallback";
+            });
+            Resilience4jTestHelper.getCircuitBreakerStatus(">>>>>>>>>> call end " + count.incrementAndGet(), circuitBreaker);
+            log.info(">>>>>>>>>> result:{}", result.get());
+        }
 
     }
+
+
 }
