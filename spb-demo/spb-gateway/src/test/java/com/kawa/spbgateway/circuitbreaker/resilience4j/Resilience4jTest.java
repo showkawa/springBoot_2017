@@ -5,11 +5,20 @@ import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import io.github.resilience4j.bulkhead.Bulkhead;
 import io.github.resilience4j.bulkhead.BulkheadConfig;
 import io.github.resilience4j.bulkhead.BulkheadRegistry;
+import io.github.resilience4j.bulkhead.internal.InMemoryBulkheadRegistry;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.github.resilience4j.circuitbreaker.internal.InMemoryCircuitBreakerRegistry;
+import io.github.resilience4j.ratelimiter.RateLimiter;
+import io.github.resilience4j.ratelimiter.RateLimiterConfig;
+import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
+import io.github.resilience4j.ratelimiter.internal.InMemoryRateLimiterRegistry;
+import io.github.resilience4j.retry.Retry;
+import io.github.resilience4j.retry.RetryConfig;
+import io.github.resilience4j.retry.RetryRegistry;
+import io.github.resilience4j.retry.internal.InMemoryRetryRegistry;
 import io.github.resilience4j.timelimiter.TimeLimiter;
 import io.github.resilience4j.timelimiter.TimeLimiterConfig;
 import io.github.resilience4j.timelimiter.TimeLimiterRegistry;
@@ -29,13 +38,15 @@ import reactor.netty.http.client.HttpClient;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.time.temporal.TemporalUnit;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Supplier;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
+import static com.kawa.spbgateway.circuitbreaker.resilience4j.Resilience4jTestHelper.releasePermission;
 import static com.kawa.spbgateway.circuitbreaker.resilience4j.Resilience4jTestHelper.weightBoolean;
 
 @Slf4j
@@ -53,11 +64,23 @@ public class Resilience4jTest {
 
     private TimeLimiterRegistry timeLimiterRegistry;
 
+    private BulkheadRegistry bulkheadRegistry;
+
+    private RetryRegistry retryRegistry;
+
+    private RateLimiterRegistry rateLimiterRegistry;
+
+    private RateLimiter rateLimiter;
+
+    private Bulkhead bulkhead;
+
+    private Retry retry;
+
     private TimeLimiter timeLimiter;
 
     private CircuitBreaker circuitBreaker;
 
-    private String PATH_200 = "/api/pancake/v1/coin/query";
+    private String PATH_200 = "/api/pancake/v1/yee/query";
 
     private String PATH_400 = "/api/hk/card/v1/er/query";
 
@@ -88,11 +111,39 @@ public class Resilience4jTest {
         timeLimiter = timeLimiterRegistry.timeLimiter("resilience4jTest",
                 TimeLimiterConfig
                         .custom()
-                        .timeoutDuration(Duration.ofMillis(1000*1))
+                        .timeoutDuration(Duration.ofMillis(1000 * 1))
                         .cancelRunningFuture(true)
                         .build());
 
+        retryRegistry = new InMemoryRetryRegistry();
+        retry = retryRegistry.retry("resilience4jTest",
+                RetryConfig
+                        .custom()
+                        .maxAttempts(3)
+                        .waitDuration(Duration.ofMillis(1000 * 1))
+                        .retryExceptions(RuntimeException.class)
+                        .build());
+
+        bulkheadRegistry = new InMemoryBulkheadRegistry();
+        bulkhead = bulkheadRegistry.bulkhead("resilience4jTest",
+                BulkheadConfig
+                        .custom()
+                        .maxConcurrentCalls(10)
+                        .maxWaitDuration(Duration.ofSeconds(1))
+                        .build());
+
+        rateLimiterRegistry = new InMemoryRateLimiterRegistry();
+        rateLimiter = rateLimiterRegistry.rateLimiter("resilience4jTest",
+                RateLimiterConfig
+                        .custom()
+                        .timeoutDuration(Duration.ofMillis(500))
+                        .limitRefreshPeriod(Duration.ofSeconds(1))
+                        .limitForPeriod(20)
+                        .build());
         Resilience4jTestHelper.circuitBreakerEventListener(circuitBreaker);
+        Resilience4jTestHelper.retryEventListener(retry);
+        Resilience4jTestHelper.bulkheadEventListener(bulkhead);
+        Resilience4jTestHelper.rateLimiterEventListener(rateLimiter);
 
         stubFor(post(urlMatching(PATH_200))
                 .willReturn(okJson("{}")));
@@ -100,13 +151,11 @@ public class Resilience4jTest {
         stubFor(post(urlMatching(PATH_400))
                 .willReturn(badRequest()));
 
-        stubFor(post(urlMatching(PATH_200))
-                .willReturn(okJson("{\"message\":\"time out\"}").withFixedDelay(1000*2)));
+        stubFor(post(urlMatching(PATH_408))
+                .willReturn(okJson("{\"message\":\"time out\"}").withFixedDelay(1000 * 2)));
 
         stubFor(post(urlMatching(PATH_500))
                 .willReturn(serverError()));
-
-
     }
 
 
@@ -213,9 +262,8 @@ public class Resilience4jTest {
         ExecutorService executorService = Executors.newFixedThreadPool(10);
         for (int i = 0; i < 30; i++) {
             String path = weightBoolean() ? PATH_408 : PATH_200;
-
             Future<String> futureStr =
-                    executorService.submit(() ->  Resilience4jTestHelper.responseToCircuitBreaker(circuitBreaker, testClient, path));
+                    executorService.submit(() -> Resilience4jTestHelper.responseToCircuitBreaker(circuitBreaker, testClient, path));
             Callable<String> stringCallable = timeLimiter.decorateFutureSupplier(() -> futureStr);
             Callable<String> response = circuitBreaker.decorateCallable(stringCallable);
             Try.of(response::call).recover(CallNotPermittedException.class, throwable -> {
@@ -226,7 +274,72 @@ public class Resilience4jTest {
                 return "hit fallback";
             });
         }
+    }
 
+    @Test
+    public void When_CircuitBreaker_Expect_Retry() {
+        AtomicInteger count = new AtomicInteger();
+        for (int i = 0; i < 30; i++) {
+            String path = weightBoolean() ? PATH_200 : PATH_500;
+            Callable<String> stringCallable = Retry.decorateCallable(retry, () -> Resilience4jTestHelper.responseToRetry(circuitBreaker, retry, testClient, path));
+            Callable<String> response = circuitBreaker.decorateCallable(stringCallable);
+            Try.of(response::call).andThen(val -> {
+                log.info(">>>>>>>>>> result {}: {}", count.incrementAndGet(), val);
+            }).recover(CallNotPermittedException.class, throwable -> {
+                Resilience4jTestHelper.getCircuitBreakerStatus(">>>>>>>>>> open circuitBreaker " + count.incrementAndGet(), circuitBreaker);
+                Resilience4jTestHelper.getRetryStatus("))))))))))", retry);
+                return "hit CircuitBreaker";
+            }).recover(throwable -> {
+                Resilience4jTestHelper.getCircuitBreakerStatus(">>>>>>>>>> call fallback " + count.incrementAndGet(), circuitBreaker);
+                Resilience4jTestHelper.getRetryStatus("))))))))))", retry);
+                return "hit fallback";
+            });
+        }
+    }
+
+    @Test
+    public void When_CircuitBreaker_Expect_Hit_Bulkhead_MaxCall() throws Exception {
+        AtomicInteger count = new AtomicInteger();
+        ExecutorService executorService = Executors.newFixedThreadPool(50);
+        for (int i = 0; i < 100; i++) {
+            if (bulkhead.tryAcquirePermission()) {
+                bulkhead.acquirePermission();
+            }
+            Future<String> futureStr =
+                    executorService.submit(() -> Resilience4jTestHelper.response(testClient, PATH_200));
+            Future<String> stringFuture = bulkhead.executeCallable(() -> futureStr);
+            Try.of(stringFuture::get).andThen(val -> {
+                log.info(">>>>>>>>>> result {}: {}", count.incrementAndGet(), val);
+            }).recover(throwable -> {
+                log.info(">>>>>>>>>> exception {}: {}", count.incrementAndGet(), throwable.getMessage());
+                return "hit fallback";
+            });
+            if (releasePermission()) {
+                bulkhead.releasePermission();
+                bulkhead.onComplete();
+            }
+            Resilience4jTestHelper.getBulkheadStatus(")))))))))) ", bulkhead);
+        }
+        executorService.shutdown();
+    }
+
+    @Test
+    public void When_CircuitBreaker_Expect_Hit_RateLimiter() throws Exception {
+        AtomicInteger count = new AtomicInteger();
+        ExecutorService executorService = Executors.newFixedThreadPool(50);
+        for (int i = 0; i < 100; i++) {
+            Future<String> futureStr =
+                    executorService.submit(() -> Resilience4jTestHelper.response(testClient, PATH_200));
+            Future<String> stringFuture = rateLimiter.executeCallable(() -> futureStr);
+            Try.of(stringFuture::get).andThen(val -> {
+                log.info(">>>>>>>>>> result {}: {}", count.incrementAndGet(), val);
+            }).recover(throwable -> {
+                log.info(">>>>>>>>>> exception {}: {}", count.incrementAndGet(), throwable.getMessage());
+                return "hit fallback";
+            });
+            Resilience4jTestHelper.getRateLimiterStatus(")))))))))) ", rateLimiter);
+        }
+        executorService.shutdown();
     }
 
 

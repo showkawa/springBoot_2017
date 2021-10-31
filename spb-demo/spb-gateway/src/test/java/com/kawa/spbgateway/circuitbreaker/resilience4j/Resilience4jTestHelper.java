@@ -1,9 +1,9 @@
 package com.kawa.spbgateway.circuitbreaker.resilience4j;
 
+import io.github.resilience4j.bulkhead.Bulkhead;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
-import io.github.resilience4j.circuitbreaker.event.CircuitBreakerEvent;
-import io.vavr.CheckedConsumer;
-import io.vavr.CheckedFunction0;
+import io.github.resilience4j.ratelimiter.RateLimiter;
+import io.github.resilience4j.retry.Retry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
@@ -45,39 +45,104 @@ public class Resilience4jTestHelper {
                 ", slowSuccessfulCalls=" + slowSuccessfulCalls +
                 " ]"
         );
-
     }
 
     public static void circuitBreakerEventListener(CircuitBreaker circuitBreaker) {
         circuitBreaker.getEventPublisher()
-                .onSuccess(event -> {
-                    log.info("---------- call service success:{}", event.toString());
-                })
+                .onSuccess(event -> log.info("---------- call service success:{}", event.toString()))
                 .onError(event -> {
                     log.info("---------- call service failed:{}", event.toString());
                     Throwable throwable = event.getThrowable();
-                    if(throwable instanceof TimeoutException){
+                    if (throwable instanceof TimeoutException) {
                         // TODO record to slow call
                     }
                 })
-                .onIgnoredError(event -> {
-                    log.info("---------- call service failed and ignore exception:{}", event.toString());
+                .onIgnoredError(event -> log.info("---------- call service failed and ignore:{}", event.toString()))
+                .onReset(event -> log.info("---------- circuit breaker reset:{}", event.toString()))
+                .onStateTransition(event -> log.info("---------- circuit breaker status updated:{}", event.toString()))
+                .onCallNotPermitted(event -> log.info("---------- circuit breaker opened:{}", event.toString()))
+                .onFailureRateExceeded(event -> log.info("---------- exceeded failure rate:{}", event.toString()))
+                .onSlowCallRateExceeded(event -> log.info("---------- exceeded slow call rate:{}", event.toString()));
+    }
+
+    /**
+     * get the Retry status and metrics
+     * * @param prefixName
+     *
+     * @param retry
+     */
+    public static void getRetryStatus(String prefixName, Retry retry) {
+
+        Retry.Metrics metrics = retry.getMetrics();
+        long successfulCallsWithRetryAttempt = metrics.getNumberOfSuccessfulCallsWithRetryAttempt();
+        long successfulCallsWithoutRetryAttempt = metrics.getNumberOfSuccessfulCallsWithoutRetryAttempt();
+        long failedCallsWithRetryAttempt = metrics.getNumberOfFailedCallsWithRetryAttempt();
+        long failedCallsWithoutRetryAttempt = metrics.getNumberOfFailedCallsWithoutRetryAttempt();
+
+        log.info(prefixName + " -> retry metrics[ successfulCallsWithRetryAttempt=" + successfulCallsWithRetryAttempt +
+                ", successfulCallsWithoutRetryAttempt=" + successfulCallsWithoutRetryAttempt +
+                ", failedCallsWithRetryAttempt=" + failedCallsWithRetryAttempt +
+                ", failedCallsWithoutRetryAttempt=" + failedCallsWithoutRetryAttempt +
+                " ]"
+        );
+    }
+
+    public static void retryEventListener(Retry retry) {
+        retry.getEventPublisher()
+                .onSuccess(event -> log.info("))))))))))) retry service success:{}", event.toString()))
+                .onError(event -> {
+                    log.info("))))))))))) retry service failed:{}", event.toString());
+                    Throwable exception = event.getLastThrowable();
+                    if (exception instanceof TimeoutException) {
+                        // TODO
+                    }
                 })
-                .onReset(event -> {
-                    log.info("---------- circuit breaker reset:{}", event.toString());
-                })
-                .onStateTransition(event -> {
-                    log.info("---------- circuit breaker status updated:{}", event.toString());
-                })
-                .onCallNotPermitted(event -> {
-                    log.info("---------- circuit breaker opened:{}", event.toString());
-                })
-                .onFailureRateExceeded(event -> {
-                    log.info("---------- exceeded failure rate:{}", event.toString());
-                })
-                .onSlowCallRateExceeded(event -> {
-                    log.info("---------- exceeded slow call rate:{}", event.toString());
-                });
+                .onIgnoredError(event -> log.info("))))))))))) retry service failed and ignore:{}", event.toString()))
+                .onRetry(event -> log.info("))))))))))) retry call service: {}", event.getNumberOfRetryAttempts()));
+
+    }
+
+    /**
+     * get the Bulkhead status and metrics
+     * * @param prefixName
+     *
+     * @param bulkhead
+     */
+    public static void getBulkheadStatus(String prefixName, Bulkhead bulkhead) {
+        Bulkhead.Metrics metrics = bulkhead.getMetrics();
+        int availableCalls = metrics.getAvailableConcurrentCalls();
+        int maxCalls = metrics.getMaxAllowedConcurrentCalls();
+        log.info(prefixName + "bulkhead metrics[ availableCalls=" + availableCalls +
+                ", maxCalls=" + maxCalls + " ]"
+        );
+    }
+
+    public static void bulkheadEventListener(Bulkhead bulkhead) {
+        bulkhead.getEventPublisher()
+                .onCallPermitted(event -> log.info("---------- call service permitted:{}", event.toString()))
+                .onCallRejected(event -> log.info("---------- call service rejected(:{}", event.toString()));
+
+    }
+
+    /**
+     * get the RateLimiter status and metrics
+     * * @param prefixName
+     *
+     * @param rateLimiter
+     */
+    public static void getRateLimiterStatus(String prefixName, RateLimiter rateLimiter) {
+        RateLimiter.Metrics metrics = rateLimiter.getMetrics();
+        int availablePermissions = metrics.getAvailablePermissions();
+        int waitingThreads = metrics.getNumberOfWaitingThreads();
+        log.info(prefixName + "rateLimiter metrics[ availablePermissions=" + availablePermissions +
+                ", waitingThreads=" + waitingThreads + " ]"
+        );
+    }
+
+    public static void rateLimiterEventListener(RateLimiter rateLimiter) {
+        rateLimiter.getEventPublisher()
+                .onSuccess(event -> log.info("---------- rateLimiter success:{}", event.toString()))
+                .onFailure(event -> log.info("---------- rateLimiter failure:{}", event.toString()));
     }
 
     public static void recordResponseToCircuitBreaker(CircuitBreaker circuitBreaker, WebTestClient testClient, String path) {
@@ -105,19 +170,36 @@ public class Resilience4jTestHelper {
         }
     }
 
-    public static String responseToCircuitBreaker(CircuitBreaker circuitBreaker, WebTestClient testClient, String path) {
+    public static String response(WebTestClient testClient, String path) {
         WebTestClient.ResponseSpec responseSpec = testClient.post().uri(path).exchange();
         try {
             responseSpec.expectStatus().is4xxClientError();
-            circuitBreaker.onError(0, TimeUnit.MILLISECONDS, new Throwable("<<<<< hit 4XX >>>>>"));
-            new RuntimeException("<<<<< hit 4XX >>>>>");
+            throw new RuntimeException("<<<<< hit 4XX >>>>>");
         } catch (Throwable error) {
         }
 
         try {
             responseSpec.expectStatus().is5xxServerError();
-            circuitBreaker.onError(0, TimeUnit.MILLISECONDS, new Throwable("<<<<< hit 5XX >>>>>"));
-            new RuntimeException("<<<<< hit 5XX >>>>>");
+            throw new RuntimeException("<<<<< hit 5XX >>>>>");
+        } catch (Throwable error) {
+        }
+        responseSpec.expectStatus().is2xxSuccessful();
+        return "hit 200";
+    }
+
+    public static String responseToCircuitBreaker(CircuitBreaker circuitBreaker, WebTestClient testClient, String path) {
+        WebTestClient.ResponseSpec responseSpec = testClient.post().uri(path).exchange();
+        try {
+            responseSpec.expectStatus().is4xxClientError();
+            circuitBreaker.onError(0, TimeUnit.MILLISECONDS, new RuntimeException("<<<<< hit 4XX >>>>>"));
+            throw new RuntimeException("<<<<< hit 4XX >>>>>");
+        } catch (Throwable error) {
+        }
+
+        try {
+            responseSpec.expectStatus().is5xxServerError();
+            circuitBreaker.onError(0, TimeUnit.MILLISECONDS, new RuntimeException("<<<<< hit 5XX >>>>>"));
+            throw new RuntimeException("<<<<< hit 5XX >>>>>");
         } catch (Throwable error) {
         }
         responseSpec.expectStatus().is2xxSuccessful();
@@ -125,12 +207,48 @@ public class Resilience4jTestHelper {
         return "hit 200";
     }
 
+    public static String responseToRetry(CircuitBreaker circuitBreaker, Retry retry, WebTestClient testClient, String path) {
+        WebTestClient.ResponseSpec responseSpec = testClient.post().uri(path).exchange();
+        try {
+            responseSpec.expectStatus().is4xxClientError();
+            circuitBreaker.onError(0, TimeUnit.MILLISECONDS, new RuntimeException("<<<<< hit 4XX >>>>>"));
+            retry.context().onError(new RuntimeException("<<<<< hit 4XX >>>>>"));
+            throw new RuntimeException("<<<<< hit 4XX >>>>>");
+        } catch (Throwable error) {
+        }
+
+        try {
+            responseSpec.expectStatus().is5xxServerError();
+            circuitBreaker.onError(0, TimeUnit.MILLISECONDS, new RuntimeException("<<<<< hit 5XX >>>>>"));
+            retry.context().onRuntimeError(new RuntimeException("<<<<< hit 5XX >>>>>"));
+            throw new RuntimeException("<<<<< hit 5XX >>>>>");
+        } catch (Throwable error) {
+        }
+        responseSpec.expectStatus().is2xxSuccessful();
+        circuitBreaker.onSuccess(0, TimeUnit.MILLISECONDS);
+        retry.context().onComplete();
+        return "hit 200";
+    }
+
     public static boolean weightBoolean() {
         if (container[0] != 1) {
-            for (int i = 0; i < 80; i++) {
+            for (int i = 0; i < 50; i++) {
                 container[i] = 1;
             }
-            for (int i = 80; i < 100; i++) {
+            for (int i = 50; i < 100; i++) {
+                container[i] = 0;
+            }
+        }
+        int index = (int) (Math.random() * 100);
+        return container[index] == 1;
+    }
+
+    public static boolean releasePermission() {
+        if (container[0] != 1) {
+            for (int i = 0; i < 70; i++) {
+                container[i] = 1;
+            }
+            for (int i = 70; i < 100; i++) {
                 container[i] = 0;
             }
         }
