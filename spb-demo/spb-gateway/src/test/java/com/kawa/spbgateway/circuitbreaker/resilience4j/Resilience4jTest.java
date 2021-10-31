@@ -10,6 +10,10 @@ import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.github.resilience4j.circuitbreaker.internal.InMemoryCircuitBreakerRegistry;
+import io.github.resilience4j.timelimiter.TimeLimiter;
+import io.github.resilience4j.timelimiter.TimeLimiterConfig;
+import io.github.resilience4j.timelimiter.TimeLimiterRegistry;
+import io.github.resilience4j.timelimiter.internal.InMemoryTimeLimiterRegistry;
 import io.vavr.CheckedFunction0;
 import io.vavr.CheckedFunction1;
 import io.vavr.control.Try;
@@ -25,7 +29,10 @@ import reactor.netty.http.client.HttpClient;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.time.temporal.TemporalUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
@@ -44,11 +51,17 @@ public class Resilience4jTest {
 
     private CircuitBreakerRegistry circuitBreakerRegistry;
 
+    private TimeLimiterRegistry timeLimiterRegistry;
+
+    private TimeLimiter timeLimiter;
+
     private CircuitBreaker circuitBreaker;
 
     private String PATH_200 = "/api/pancake/v1/coin/query";
 
     private String PATH_400 = "/api/hk/card/v1/er/query";
+
+    private String PATH_408 = "/api/pancake/v1/coin/query";
 
     private String PATH_500 = "/api/hk/card/v1/card/query";
 
@@ -71,6 +84,14 @@ public class Resilience4jTest {
                         .slidingWindowSize(10)
                         .build());
 
+        timeLimiterRegistry = new InMemoryTimeLimiterRegistry();
+        timeLimiter = timeLimiterRegistry.timeLimiter("resilience4jTest",
+                TimeLimiterConfig
+                        .custom()
+                        .timeoutDuration(Duration.ofMillis(1000*1))
+                        .cancelRunningFuture(true)
+                        .build());
+
         Resilience4jTestHelper.circuitBreakerEventListener(circuitBreaker);
 
         stubFor(post(urlMatching(PATH_200))
@@ -78,6 +99,9 @@ public class Resilience4jTest {
 
         stubFor(post(urlMatching(PATH_400))
                 .willReturn(badRequest()));
+
+        stubFor(post(urlMatching(PATH_200))
+                .willReturn(okJson("{\"message\":\"time out\"}").withFixedDelay(1000*2)));
 
         stubFor(post(urlMatching(PATH_500))
                 .willReturn(serverError()));
@@ -179,6 +203,28 @@ public class Resilience4jTest {
             });
             Resilience4jTestHelper.getCircuitBreakerStatus(">>>>>>>>>> call end " + count.incrementAndGet(), circuitBreaker);
             log.info(">>>>>>>>>> result:{}", result.get());
+        }
+
+    }
+
+    @Test
+    public void When_CircuitBreaker_Expect_Timeout() {
+        AtomicInteger count = new AtomicInteger();
+        ExecutorService executorService = Executors.newFixedThreadPool(10);
+        for (int i = 0; i < 30; i++) {
+            String path = weightBoolean() ? PATH_408 : PATH_200;
+
+            Future<String> futureStr =
+                    executorService.submit(() ->  Resilience4jTestHelper.responseToCircuitBreaker(circuitBreaker, testClient, path));
+            Callable<String> stringCallable = timeLimiter.decorateFutureSupplier(() -> futureStr);
+            Callable<String> response = circuitBreaker.decorateCallable(stringCallable);
+            Try.of(response::call).recover(CallNotPermittedException.class, throwable -> {
+                Resilience4jTestHelper.getCircuitBreakerStatus(">>>>>>>>>> open CircuitBreaker " + count.incrementAndGet(), circuitBreaker);
+                return "hit CircuitBreaker";
+            }).recover(throwable -> {
+                Resilience4jTestHelper.getCircuitBreakerStatus(">>>>>>>>>> call fallback " + count.incrementAndGet(), circuitBreaker);
+                return "hit fallback";
+            });
         }
 
     }

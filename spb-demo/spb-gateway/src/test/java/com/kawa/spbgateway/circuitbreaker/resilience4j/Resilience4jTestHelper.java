@@ -1,12 +1,14 @@
 package com.kawa.spbgateway.circuitbreaker.resilience4j;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
+import io.github.resilience4j.circuitbreaker.event.CircuitBreakerEvent;
 import io.vavr.CheckedConsumer;
 import io.vavr.CheckedFunction0;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 @Slf4j
 public class Resilience4jTestHelper {
@@ -53,6 +55,10 @@ public class Resilience4jTestHelper {
                 })
                 .onError(event -> {
                     log.info("---------- call service failed:{}", event.toString());
+                    Throwable throwable = event.getThrowable();
+                    if(throwable instanceof TimeoutException){
+                        // TODO record to slow call
+                    }
                 })
                 .onIgnoredError(event -> {
                     log.info("---------- call service failed and ignore exception:{}", event.toString());
