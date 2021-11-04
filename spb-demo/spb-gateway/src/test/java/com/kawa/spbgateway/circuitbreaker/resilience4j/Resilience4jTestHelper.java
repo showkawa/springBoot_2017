@@ -15,13 +15,16 @@ public class Resilience4jTestHelper {
 
     static int[] container = new int[100];
 
+    static int[] fallbackContainer = new int[100];
+
     /**
      * get the CircuitBreaker status and metrics
-     * * @param prefixName
      *
+     * @param prefixName
      * @param circuitBreaker
+     * @return circuitBreaker state
      */
-    public static void getCircuitBreakerStatus(String prefixName, CircuitBreaker circuitBreaker) {
+    public static String getCircuitBreakerStatus(String prefixName, CircuitBreaker circuitBreaker) {
 
         CircuitBreaker.Metrics metrics = circuitBreaker.getMetrics();
         float failureRate = metrics.getFailureRate();
@@ -45,24 +48,26 @@ public class Resilience4jTestHelper {
                 ", slowSuccessfulCalls=" + slowSuccessfulCalls +
                 " ]"
         );
+        log.info(prefixName + " circuitBreaker tags:{}", circuitBreaker.getTags());
+        return circuitBreaker.getState().name();
     }
 
     public static void circuitBreakerEventListener(CircuitBreaker circuitBreaker) {
         circuitBreaker.getEventPublisher()
-                .onSuccess(event -> log.info("---------- call service success:{}", event))
+                .onSuccess(event -> log.info("---------- CircuitBreakerEvent:{}  CircuitBreakerName:{}", event.getEventType(), event.getCircuitBreakerName()))
                 .onError(event -> {
-                    log.info("---------- call service failed:{}", event);
+                    log.info("---------- CircuitBreakerEvent:{}  CircuitBreakerName:{}", event.getEventType(), event.getCircuitBreakerName());
                     Throwable throwable = event.getThrowable();
                     if (throwable instanceof TimeoutException) {
                         // TODO record to slow call
                     }
                 })
-                .onIgnoredError(event -> log.info("---------- call service failed and ignore:{}", event))
-                .onReset(event -> log.info("---------- circuit breaker reset:{}", event))
-                .onStateTransition(event -> log.info("---------- circuit breaker status updated:{}", event))
-                .onCallNotPermitted(event -> log.info("---------- circuit breaker opened:{}", event))
-                .onFailureRateExceeded(event -> log.info("---------- exceeded failure rate:{}", event))
-                .onSlowCallRateExceeded(event -> log.info("---------- exceeded slow call rate:{}", event));
+                .onIgnoredError(event -> log.info("---------- CircuitBreakerEvent:{}  CircuitBreakerName:{}", event.getEventType(), event.getCircuitBreakerName()))
+                .onReset(event -> log.info("---------- CircuitBreakerEvent:{}  CircuitBreakerName:{}", event.getEventType(), event.getCircuitBreakerName()))
+                .onStateTransition(event -> log.info("---------- CircuitBreakerEvent:{}  CircuitBreakerName:{}", event.getEventType(), event.getCircuitBreakerName()))
+                .onCallNotPermitted(event -> log.info("---------- CircuitBreakerEvent:{}  CircuitBreakerName:{}", event.getEventType(), event.getCircuitBreakerName()))
+                .onFailureRateExceeded(event -> log.info("---------- CircuitBreakerEvent:{}  CircuitBreakerName:{}", event.getEventType(), event.getCircuitBreakerName()))
+                .onSlowCallRateExceeded(event -> log.info("---------- CircuitBreakerEvent:{}  CircuitBreakerName:{}", event.getEventType(), event.getCircuitBreakerName()));
     }
 
     /**
@@ -156,16 +161,40 @@ public class Resilience4jTestHelper {
 
         try {
             responseSpec.expectStatus().is4xxClientError();
-            circuitBreaker.onError(0, TimeUnit.MILLISECONDS, new Throwable("<<<< hit 4XX >>>>"));
+            circuitBreaker.onError(0, TimeUnit.MILLISECONDS, new RuntimeException("<<<< hit 4XX >>>>"));
             return;
         } catch (Throwable error) {
         }
 
         try {
             responseSpec.expectStatus().is5xxServerError();
-            circuitBreaker.onError(0, TimeUnit.MILLISECONDS, new Throwable("<<<< hit 5XX >>>>"));
+            circuitBreaker.onError(0, TimeUnit.MILLISECONDS, new RuntimeException("<<<< hit 5XX >>>>"));
         } catch (Throwable error) {
-            circuitBreaker.onError(0, TimeUnit.MILLISECONDS, new Throwable("<<<< hit unknown error >>>>"));
+            circuitBreaker.onError(0, TimeUnit.MILLISECONDS, new RuntimeException("<<<< hit unknown error >>>>"));
+            return;
+        }
+    }
+
+    public static void recordSlowCallResponseToCircuitBreaker(CircuitBreaker circuitBreaker, WebTestClient testClient, String path) {
+        WebTestClient.ResponseSpec responseSpec = testClient.post().uri(path).exchange();
+        try {
+            responseSpec.expectStatus().is2xxSuccessful();
+            return;
+        } catch (Throwable error) {
+        }
+
+        try {
+            responseSpec.expectStatus().is4xxClientError();
+            circuitBreaker.onError(0, TimeUnit.MILLISECONDS, new RuntimeException("<<<< hit 4XX >>>>"));
+            return;
+        } catch (Throwable error) {
+        }
+
+        try {
+            responseSpec.expectStatus().is5xxServerError();
+            circuitBreaker.onError(0, TimeUnit.MILLISECONDS, new RuntimeException("<<<< hit 5XX >>>>"));
+        } catch (Throwable error) {
+            circuitBreaker.onError(0, TimeUnit.MILLISECONDS, new RuntimeException("<<<< hit unknown error >>>>"));
             return;
         }
     }
@@ -203,7 +232,6 @@ public class Resilience4jTestHelper {
         } catch (Throwable error) {
         }
         responseSpec.expectStatus().is2xxSuccessful();
-        circuitBreaker.onSuccess(0, TimeUnit.MILLISECONDS);
         return "hit 200";
     }
 
@@ -230,17 +258,17 @@ public class Resilience4jTestHelper {
         return "hit 200";
     }
 
-    public static boolean weightBoolean() {
-        if (container[0] != 1) {
-            for (int i = 0; i < 50; i++) {
-                container[i] = 1;
+    public static boolean expectError() {
+        if (fallbackContainer[0] != 1) {
+            for (int i = 0; i < 90; i++) {
+                fallbackContainer[i] = 1;
             }
-            for (int i = 50; i < 100; i++) {
-                container[i] = 0;
+            for (int i = 90; i < 100; i++) {
+                fallbackContainer[i] = 0;
             }
         }
         int index = (int) (Math.random() * 100);
-        return container[index] == 1;
+        return fallbackContainer[index] == 1;
     }
 
     public static boolean releasePermission() {

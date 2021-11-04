@@ -25,6 +25,7 @@ import io.github.resilience4j.timelimiter.TimeLimiterRegistry;
 import io.github.resilience4j.timelimiter.internal.InMemoryTimeLimiterRegistry;
 import io.vavr.CheckedFunction0;
 import io.vavr.CheckedFunction1;
+import io.vavr.collection.HashMap;
 import io.vavr.control.Try;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
@@ -46,8 +47,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
+import static com.kawa.spbgateway.circuitbreaker.resilience4j.Resilience4jTestHelper.expectError;
 import static com.kawa.spbgateway.circuitbreaker.resilience4j.Resilience4jTestHelper.releasePermission;
-import static com.kawa.spbgateway.circuitbreaker.resilience4j.Resilience4jTestHelper.weightBoolean;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Slf4j
 @TestPropertySource(properties = {
@@ -70,6 +72,12 @@ public class Resilience4jTest {
 
     private RateLimiterRegistry rateLimiterRegistry;
 
+    private CircuitBreaker circuitBreaker;
+
+    private CircuitBreaker circuitBreakerWithTags;
+
+    private CircuitBreakerConfig circuitBreakerConfig;
+
     private RateLimiter rateLimiter;
 
     private Bulkhead bulkhead;
@@ -78,7 +86,6 @@ public class Resilience4jTest {
 
     private TimeLimiter timeLimiter;
 
-    private CircuitBreaker circuitBreaker;
 
     private String PATH_200 = "/api/pancake/v1/yee/query";
 
@@ -98,16 +105,16 @@ public class Resilience4jTest {
                 .build();
 
         circuitBreakerRegistry = new InMemoryCircuitBreakerRegistry();
-        circuitBreaker = circuitBreakerRegistry.circuitBreaker("resilience4jTest",
-                CircuitBreakerConfig
-                        .custom()
-                        .failureRateThreshold(50)
-                        .slowCallRateThreshold(90)
-                        .slowCallDurationThreshold(Duration.ofMillis(1000*1))
-                        .minimumNumberOfCalls(10)
-                        .slidingWindowType(CircuitBreakerConfig.SlidingWindowType.COUNT_BASED)
-                        .slidingWindowSize(10)
-                        .build());
+        circuitBreakerConfig = CircuitBreakerConfig
+                .custom()
+                .failureRateThreshold(70)
+                .slowCallRateThreshold(90)
+                .slowCallDurationThreshold(Duration.ofMillis(1000 * 1))
+                .minimumNumberOfCalls(10)
+                .slidingWindowType(CircuitBreakerConfig.SlidingWindowType.COUNT_BASED)
+                .slidingWindowSize(10)
+                .build();
+        circuitBreaker = circuitBreakerRegistry.circuitBreaker("resilience4jTest", circuitBreakerConfig);
 
         timeLimiterRegistry = new InMemoryTimeLimiterRegistry();
         timeLimiter = timeLimiterRegistry.timeLimiter("resilience4jTest",
@@ -162,108 +169,63 @@ public class Resilience4jTest {
 
 
     @Test
-    public void circuitBreakerRegistryTest() {
-        CircuitBreakerRegistry circuitBreakerRegistry = CircuitBreakerRegistry.of(CircuitBreakerConfig.custom()
-                .failureRateThreshold(50)
-                .slowCallRateThreshold(50)
-                .slowCallDurationThreshold(Duration.ofSeconds(2))
-                .waitDurationInOpenState(Duration.ofMillis(1000))
-                .permittedNumberOfCallsInHalfOpenState(5)
-                .minimumNumberOfCalls(10)
-                .slidingWindowType(CircuitBreakerConfig.SlidingWindowType.TIME_BASED)
-                .slidingWindowSize(10)
-                .recordExceptions(IOException.class, TimeoutException.class)
-//                .ignoreExceptions()
-                .build());
-        CircuitBreaker circuitBreaker = circuitBreakerRegistry.circuitBreaker(this.getClass().getSimpleName());
-        CheckedFunction0<String> decorateCheckedSupplier = CircuitBreaker.decorateCheckedSupplier(circuitBreaker, () -> "kawa");
-        Try<String> result = Try.of(decorateCheckedSupplier).map(val -> val + " show");
-        log.info(">>>>>>>>>> circuitBreakerRegistryTest {} - {}", result.isSuccess(), result.get());
-
-        // combine  multiple CircuitBreaker
-        CircuitBreaker brianT1 = CircuitBreaker.ofDefaults("brianT1");
-        CircuitBreaker brianT2 = CircuitBreaker.ofDefaults("brianT2");
-        CheckedFunction0<String> decorateCheckedSupplier2 = CircuitBreaker.decorateCheckedSupplier(brianT1, () -> "the first process");
-        CheckedFunction1<Object, String> objectStringCheckedFunction = CircuitBreaker.decorateCheckedFunction(brianT2, input -> input + " and the second process");
-        Try<String> result2 = Try.of(decorateCheckedSupplier2).mapTry(objectStringCheckedFunction::apply);
-        log.info(">>>>>>>>>> circuitBreakerRegistryTest2 {} - {}", result2.isSuccess(), result2.get());
-
-        // recover from exception
-        CircuitBreaker brianT13 = CircuitBreaker.ofDefaults("brianT3");
-        Try<Object> result3 = Try.of(CircuitBreaker.decorateCheckedSupplier(brianT13, () -> {
-            throw new RuntimeException("circuit breaker test");
-        })).recover(throwable -> "status OK");
-        log.info(">>>>>>>>>> circuitBreakerRegistryTest3 {} - {}", result3.isSuccess(), result3.get());
-
-        // listen the status
-        CircuitBreaker.Metrics metrics = brianT13.getMetrics();
-        log.info(">>>>>>>>>> circuitBreakerRegistryTest3 {} - {}", metrics.getFailureRate(), metrics.getNumberOfFailedCalls());
+    public void When_Test_CircuitBreaker_Expect_Close() {
+        AtomicInteger count = new AtomicInteger();
+        for (int i = 0; i < 10; i++) {
+            Resilience4jTestHelper.recordResponseToCircuitBreaker(circuitBreaker, testClient, PATH_200);
+            Resilience4jTestHelper.getCircuitBreakerStatus(">>>>>>>>>> end call " + count.incrementAndGet(), circuitBreaker);
+        }
+        assertEquals(CircuitBreaker.State.CLOSED.name(), circuitBreaker.getState().name());
     }
 
-    @Test
-    public void bulkheadRegistryTest() {
-        Bulkhead bulkhead1 = BulkheadRegistry.of(BulkheadConfig.custom()
-                .maxConcurrentCalls(10)
-                .maxWaitDuration(Duration.ofMillis(500))
-                .build()).bulkhead("bulkhead1");
-        CheckedFunction0<String> decorateCheckedSupplier = Bulkhead.decorateCheckedSupplier(bulkhead1, () -> "test the ");
-        Try<String> result = Try.of(decorateCheckedSupplier).map(val -> val + "Bulkhead");
-        log.info(">>>>>>>>>> bulkheadRegistryTest {} - {}", result.isSuccess(), result.get());
-
-    }
-
-    /**
-     * use executeCheckedSupplier or executeSupplier no need use degradation
-     */
     @Test
     public void When_CircuitBreaker_Expect_Open() {
-        AtomicInteger count = new AtomicInteger();
-        try {
-            for (int i = 0; i < 10; i++) {
-                circuitBreaker.executeCheckedSupplier(() -> {
-                    Resilience4jTestHelper.recordResponseToCircuitBreaker(circuitBreaker, testClient, PATH_200);
-                    Resilience4jTestHelper.getCircuitBreakerStatus(">>>>>>>>>> end call " + count.incrementAndGet(), circuitBreaker);
-                    return null;
-                });
-            }
-            for (int i = 0; i < 10; i++) {
-                circuitBreaker.executeCheckedSupplier(() -> {
-                    Resilience4jTestHelper.recordResponseToCircuitBreaker(circuitBreaker, testClient, PATH_408);
-                    Resilience4jTestHelper.getCircuitBreakerStatus(">>>>>>>>>> end call " + count.incrementAndGet(), circuitBreaker);
-                    return null;
-                });
-            }
-            for (int i = 0; i < 10; i++) {
-                circuitBreaker.executeCheckedSupplier(() -> {
-                    Resilience4jTestHelper.recordResponseToCircuitBreaker(circuitBreaker, testClient, PATH_400);
-                    Resilience4jTestHelper.getCircuitBreakerStatus(">>>>>>>>>> end call " + count.incrementAndGet(), circuitBreaker);
-                    return null;
-                });
-            }
+        circuitBreakerWithTags = circuitBreakerRegistry.circuitBreaker("circuitBreakerWithTags", circuitBreakerConfig, HashMap.of("resilience4jTest", "When_CircuitBreaker_Expect_Open"));
+        Resilience4jTestHelper.circuitBreakerEventListener(circuitBreakerWithTags);
 
-        } catch (Throwable error) {
-            log.error(String.format(">>>>>>>>>> %s", error.getMessage()));
+        AtomicInteger count = new AtomicInteger();
+        for (int i = 0; i < 10; i++) {
+            Resilience4jTestHelper.recordResponseToCircuitBreaker(circuitBreakerWithTags, testClient, PATH_400);
+            Resilience4jTestHelper.getCircuitBreakerStatus(">>>>>>>>>> end call " + count.incrementAndGet(), circuitBreakerWithTags);
         }
+        assertEquals(CircuitBreaker.State.OPEN.name(), circuitBreakerWithTags.getState().name());
+    }
+
+    @Test
+    public void When_Test_CircuitBreaker_Expect_SlowCall() throws Throwable {
+        AtomicInteger count = new AtomicInteger();
+        for (int i = 0; i < 10; i++) {
+            circuitBreaker.executeCheckedSupplier(() -> {
+                Resilience4jTestHelper.recordSlowCallResponseToCircuitBreaker(circuitBreaker, testClient, PATH_408);
+                return null;
+            });
+            Resilience4jTestHelper.getCircuitBreakerStatus(">>>>>>>>>> end call " + count.incrementAndGet(), circuitBreaker);
+        }
+        assertEquals(CircuitBreaker.State.OPEN.name(), circuitBreaker.getState().name());
     }
 
     @Test
     public void When_CircuitBreaker_Expect_Fallback() {
         AtomicInteger count = new AtomicInteger();
-        for (int i = 0; i < 100; i++) {
-            String path = weightBoolean() ? PATH_500 : PATH_200;
+        for (int i = 0; i < 20; i++) {
+            String path = PATH_500;
             CheckedFunction0<String> response =
                     circuitBreaker.decorateCheckedSupplier(() -> Resilience4jTestHelper.responseToCircuitBreaker(circuitBreaker, testClient, path));
-            Try<String> result = Try.of(response).recover(CallNotPermittedException.class, throwable -> {
+            Try<String> result = Try.of(response).map(val -> {
+                Resilience4jTestHelper.getCircuitBreakerStatus(">>>>>>>>>> call success " + count.incrementAndGet(), circuitBreaker);
+                return val;
+            }).recover(CallNotPermittedException.class, throwable -> {
                 Resilience4jTestHelper.getCircuitBreakerStatus(">>>>>>>>>> open CircuitBreaker " + count.incrementAndGet(), circuitBreaker);
-                return "hit CircuitBreaker";
+                return "hit CallNotPermittedException";
             }).recover(throwable -> {
                 Resilience4jTestHelper.getCircuitBreakerStatus(">>>>>>>>>> call fallback " + count.incrementAndGet(), circuitBreaker);
                 return "hit fallback";
             });
-            Resilience4jTestHelper.getCircuitBreakerStatus(">>>>>>>>>> call end " + count.incrementAndGet(), circuitBreaker);
             log.info(">>>>>>>>>> result:{}", result.get());
+            if (count.get() > 10) {
+                assertEquals("hit CallNotPermittedException", result.get());
+            }
         }
-
     }
 
     @Test
@@ -271,7 +233,7 @@ public class Resilience4jTest {
         AtomicInteger count = new AtomicInteger();
         ExecutorService executorService = Executors.newFixedThreadPool(10);
         for (int i = 0; i < 30; i++) {
-            String path = weightBoolean() ? PATH_408 : PATH_200;
+            String path = expectError() ? PATH_408 : PATH_200;
             Future<String> futureStr =
                     executorService.submit(() -> Resilience4jTestHelper.responseToCircuitBreaker(circuitBreaker, testClient, path));
             Callable<String> stringCallable = timeLimiter.decorateFutureSupplier(() -> futureStr);
@@ -290,7 +252,7 @@ public class Resilience4jTest {
     public void When_CircuitBreaker_Expect_Retry() {
         AtomicInteger count = new AtomicInteger();
         for (int i = 0; i < 30; i++) {
-            String path = weightBoolean() ? PATH_200 : PATH_500;
+            String path = expectError() ? PATH_200 : PATH_500;
             Callable<String> stringCallable = Retry.decorateCallable(retry, () -> Resilience4jTestHelper.responseToRetry(circuitBreaker, retry, testClient, path));
             Callable<String> response = circuitBreaker.decorateCallable(stringCallable);
             Try.of(response::call).andThen(val -> {
@@ -350,6 +312,57 @@ public class Resilience4jTest {
             Resilience4jTestHelper.getRateLimiterStatus(")))))))))) ", rateLimiter);
         }
         executorService.shutdown();
+    }
+
+    @Test
+    public void circuitBreakerRegistryTest() {
+        CircuitBreakerRegistry circuitBreakerRegistry = CircuitBreakerRegistry.of(CircuitBreakerConfig.custom()
+                .failureRateThreshold(50)
+                .slowCallRateThreshold(50)
+                .slowCallDurationThreshold(Duration.ofSeconds(2))
+                .waitDurationInOpenState(Duration.ofMillis(1000))
+                .permittedNumberOfCallsInHalfOpenState(5)
+                .minimumNumberOfCalls(10)
+                .slidingWindowType(CircuitBreakerConfig.SlidingWindowType.TIME_BASED)
+                .slidingWindowSize(10)
+                .recordExceptions(IOException.class, TimeoutException.class)
+//                .ignoreExceptions()
+                .build());
+        CircuitBreaker circuitBreaker = circuitBreakerRegistry.circuitBreaker(this.getClass().getSimpleName());
+        CheckedFunction0<String> decorateCheckedSupplier = CircuitBreaker.decorateCheckedSupplier(circuitBreaker, () -> "kawa");
+        Try<String> result = Try.of(decorateCheckedSupplier).map(val -> val + " show");
+        log.info(">>>>>>>>>> circuitBreakerRegistryTest {} - {}", result.isSuccess(), result.get());
+
+        // combine  multiple CircuitBreaker
+        CircuitBreaker brianT1 = CircuitBreaker.ofDefaults("brianT1");
+        CircuitBreaker brianT2 = CircuitBreaker.ofDefaults("brianT2");
+        CheckedFunction0<String> decorateCheckedSupplier2 = CircuitBreaker.decorateCheckedSupplier(brianT1, () -> "the first process");
+        CheckedFunction1<Object, String> objectStringCheckedFunction = CircuitBreaker.decorateCheckedFunction(brianT2, input -> input + " and the second process");
+        Try<String> result2 = Try.of(decorateCheckedSupplier2).mapTry(objectStringCheckedFunction::apply);
+        log.info(">>>>>>>>>> circuitBreakerRegistryTest2 {} - {}", result2.isSuccess(), result2.get());
+
+        // recover from exception
+        CircuitBreaker brianT13 = CircuitBreaker.ofDefaults("brianT3");
+        Try<Object> result3 = Try.of(CircuitBreaker.decorateCheckedSupplier(brianT13, () -> {
+            throw new RuntimeException("circuit breaker test");
+        })).recover(throwable -> "status OK");
+        log.info(">>>>>>>>>> circuitBreakerRegistryTest3 {} - {}", result3.isSuccess(), result3.get());
+
+        // listen the status
+        CircuitBreaker.Metrics metrics = brianT13.getMetrics();
+        log.info(">>>>>>>>>> circuitBreakerRegistryTest3 {} - {}", metrics.getFailureRate(), metrics.getNumberOfFailedCalls());
+    }
+
+    @Test
+    public void bulkheadRegistryTest() {
+        Bulkhead bulkhead1 = BulkheadRegistry.of(BulkheadConfig.custom()
+                .maxConcurrentCalls(10)
+                .maxWaitDuration(Duration.ofMillis(500))
+                .build()).bulkhead("bulkhead1");
+        CheckedFunction0<String> decorateCheckedSupplier = Bulkhead.decorateCheckedSupplier(bulkhead1, () -> "test the ");
+        Try<String> result = Try.of(decorateCheckedSupplier).map(val -> val + "Bulkhead");
+        log.info(">>>>>>>>>> bulkheadRegistryTest {} - {}", result.isSuccess(), result.get());
+
     }
 
 
