@@ -102,6 +102,8 @@ public class Resilience4jTest {
                 CircuitBreakerConfig
                         .custom()
                         .failureRateThreshold(50)
+                        .slowCallRateThreshold(90)
+                        .slowCallDurationThreshold(Duration.ofMillis(1000*1))
                         .minimumNumberOfCalls(10)
                         .slidingWindowType(CircuitBreakerConfig.SlidingWindowType.COUNT_BASED)
                         .slidingWindowSize(10)
@@ -226,11 +228,19 @@ public class Resilience4jTest {
             }
             for (int i = 0; i < 10; i++) {
                 circuitBreaker.executeCheckedSupplier(() -> {
+                    Resilience4jTestHelper.recordResponseToCircuitBreaker(circuitBreaker, testClient, PATH_408);
+                    Resilience4jTestHelper.getCircuitBreakerStatus(">>>>>>>>>> end call " + count.incrementAndGet(), circuitBreaker);
+                    return null;
+                });
+            }
+            for (int i = 0; i < 10; i++) {
+                circuitBreaker.executeCheckedSupplier(() -> {
                     Resilience4jTestHelper.recordResponseToCircuitBreaker(circuitBreaker, testClient, PATH_400);
                     Resilience4jTestHelper.getCircuitBreakerStatus(">>>>>>>>>> end call " + count.incrementAndGet(), circuitBreaker);
                     return null;
                 });
             }
+
         } catch (Throwable error) {
             log.error(String.format(">>>>>>>>>> %s", error.getMessage()));
         }

@@ -49,20 +49,20 @@ public class Resilience4jTestHelper {
 
     public static void circuitBreakerEventListener(CircuitBreaker circuitBreaker) {
         circuitBreaker.getEventPublisher()
-                .onSuccess(event -> log.info("---------- call service success:{}", event.toString()))
+                .onSuccess(event -> log.info("---------- call service success:{}", event))
                 .onError(event -> {
-                    log.info("---------- call service failed:{}", event.toString());
+                    log.info("---------- call service failed:{}", event);
                     Throwable throwable = event.getThrowable();
                     if (throwable instanceof TimeoutException) {
                         // TODO record to slow call
                     }
                 })
-                .onIgnoredError(event -> log.info("---------- call service failed and ignore:{}", event.toString()))
-                .onReset(event -> log.info("---------- circuit breaker reset:{}", event.toString()))
-                .onStateTransition(event -> log.info("---------- circuit breaker status updated:{}", event.toString()))
-                .onCallNotPermitted(event -> log.info("---------- circuit breaker opened:{}", event.toString()))
-                .onFailureRateExceeded(event -> log.info("---------- exceeded failure rate:{}", event.toString()))
-                .onSlowCallRateExceeded(event -> log.info("---------- exceeded slow call rate:{}", event.toString()));
+                .onIgnoredError(event -> log.info("---------- call service failed and ignore:{}", event))
+                .onReset(event -> log.info("---------- circuit breaker reset:{}", event))
+                .onStateTransition(event -> log.info("---------- circuit breaker status updated:{}", event))
+                .onCallNotPermitted(event -> log.info("---------- circuit breaker opened:{}", event))
+                .onFailureRateExceeded(event -> log.info("---------- exceeded failure rate:{}", event))
+                .onSlowCallRateExceeded(event -> log.info("---------- exceeded slow call rate:{}", event));
     }
 
     /**
@@ -89,15 +89,15 @@ public class Resilience4jTestHelper {
 
     public static void retryEventListener(Retry retry) {
         retry.getEventPublisher()
-                .onSuccess(event -> log.info("))))))))))) retry service success:{}", event.toString()))
+                .onSuccess(event -> log.info("))))))))))) retry service success:{}", event))
                 .onError(event -> {
-                    log.info("))))))))))) retry service failed:{}", event.toString());
+                    log.info("))))))))))) retry service failed:{}", event);
                     Throwable exception = event.getLastThrowable();
                     if (exception instanceof TimeoutException) {
                         // TODO
                     }
                 })
-                .onIgnoredError(event -> log.info("))))))))))) retry service failed and ignore:{}", event.toString()))
+                .onIgnoredError(event -> log.info("))))))))))) retry service failed and ignore:{}", event))
                 .onRetry(event -> log.info("))))))))))) retry call service: {}", event.getNumberOfRetryAttempts()));
 
     }
@@ -119,8 +119,8 @@ public class Resilience4jTestHelper {
 
     public static void bulkheadEventListener(Bulkhead bulkhead) {
         bulkhead.getEventPublisher()
-                .onCallPermitted(event -> log.info("---------- call service permitted:{}", event.toString()))
-                .onCallRejected(event -> log.info("---------- call service rejected(:{}", event.toString()));
+                .onCallPermitted(event -> log.info("---------- call service permitted:{}", event))
+                .onCallRejected(event -> log.info("---------- call service rejected:{}", event));
 
     }
 
@@ -141,8 +141,8 @@ public class Resilience4jTestHelper {
 
     public static void rateLimiterEventListener(RateLimiter rateLimiter) {
         rateLimiter.getEventPublisher()
-                .onSuccess(event -> log.info("---------- rateLimiter success:{}", event.toString()))
-                .onFailure(event -> log.info("---------- rateLimiter failure:{}", event.toString()));
+                .onSuccess(event -> log.info("---------- rateLimiter success:{}", event))
+                .onFailure(event -> log.info("---------- rateLimiter failure:{}", event));
     }
 
     public static void recordResponseToCircuitBreaker(CircuitBreaker circuitBreaker, WebTestClient testClient, String path) {
