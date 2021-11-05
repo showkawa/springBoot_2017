@@ -1,9 +1,11 @@
 package com.kawa.spbgateway.circuitbreaker.resilience4j;
 
 import io.github.resilience4j.bulkhead.Bulkhead;
+import io.github.resilience4j.bulkhead.BulkheadFullException;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.ratelimiter.RateLimiter;
 import io.github.resilience4j.retry.Retry;
+import io.github.resilience4j.timelimiter.TimeLimiter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
@@ -71,6 +73,26 @@ public class Resilience4jTestHelper {
     }
 
     /**
+     * get the Bulkhead status and metrics
+     * * @param prefixName
+     *
+     * @param bulkhead
+     */
+    public static void getBulkheadStatus(String prefixName, Bulkhead bulkhead) {
+        Bulkhead.Metrics metrics = bulkhead.getMetrics();
+        int availableCalls = metrics.getAvailableConcurrentCalls();
+        int maxCalls = metrics.getMaxAllowedConcurrentCalls();
+        log.info(prefixName + "bulkhead metrics[ availableCalls=" + availableCalls +
+                ", maxCalls=" + maxCalls + " ],tags=" + bulkhead.getTags());
+    }
+
+    public static void bulkheadEventListener(Bulkhead bulkhead) {
+        bulkhead.getEventPublisher()
+                .onCallRejected(event -> log.info("---------- BulkheadEvent:{}  BulkheadName:{}", event.getEventType(), event.getBulkheadName()))
+                .onCallFinished(event -> log.info("---------- BulkheadEvent:{}  BulkheadName:{}", event.getEventType(), event.getBulkheadName()));
+    }
+
+    /**
      * get the Retry status and metrics
      * * @param prefixName
      *
@@ -84,10 +106,10 @@ public class Resilience4jTestHelper {
         long failedCallsWithRetryAttempt = metrics.getNumberOfFailedCallsWithRetryAttempt();
         long failedCallsWithoutRetryAttempt = metrics.getNumberOfFailedCallsWithoutRetryAttempt();
 
-        log.info(prefixName + " -> retry metrics[ successfulCallsWithRetryAttempt=" + successfulCallsWithRetryAttempt +
-                ", successfulCallsWithoutRetryAttempt=" + successfulCallsWithoutRetryAttempt +
-                ", failedCallsWithRetryAttempt=" + failedCallsWithRetryAttempt +
-                ", failedCallsWithoutRetryAttempt=" + failedCallsWithoutRetryAttempt +
+        log.info(prefixName + " -> retry metrics[ successfulCallsWithRetry=" + successfulCallsWithRetryAttempt +
+                ", successfulCallsWithoutRetry=" + successfulCallsWithoutRetryAttempt +
+                ", failedCallsWithRetry=" + failedCallsWithRetryAttempt +
+                ", failedCallsWithoutRetry=" + failedCallsWithoutRetryAttempt +
                 " ]"
         );
     }
@@ -104,28 +126,6 @@ public class Resilience4jTestHelper {
                 })
                 .onIgnoredError(event -> log.info("))))))))))) retry service failed and ignore:{}", event))
                 .onRetry(event -> log.info("))))))))))) retry call service: {}", event.getNumberOfRetryAttempts()));
-
-    }
-
-    /**
-     * get the Bulkhead status and metrics
-     * * @param prefixName
-     *
-     * @param bulkhead
-     */
-    public static void getBulkheadStatus(String prefixName, Bulkhead bulkhead) {
-        Bulkhead.Metrics metrics = bulkhead.getMetrics();
-        int availableCalls = metrics.getAvailableConcurrentCalls();
-        int maxCalls = metrics.getMaxAllowedConcurrentCalls();
-        log.info(prefixName + "bulkhead metrics[ availableCalls=" + availableCalls +
-                ", maxCalls=" + maxCalls + " ]"
-        );
-    }
-
-    public static void bulkheadEventListener(Bulkhead bulkhead) {
-        bulkhead.getEventPublisher()
-                .onCallPermitted(event -> log.info("---------- call service permitted:{}", event))
-                .onCallRejected(event -> log.info("---------- call service rejected:{}", event));
 
     }
 
@@ -148,6 +148,14 @@ public class Resilience4jTestHelper {
         rateLimiter.getEventPublisher()
                 .onSuccess(event -> log.info("---------- rateLimiter success:{}", event))
                 .onFailure(event -> log.info("---------- rateLimiter failure:{}", event));
+    }
+
+
+    public static void timeLimiterEventListener(TimeLimiter timeLimiter) {
+        timeLimiter.getEventPublisher()
+                .onSuccess(event -> log.info("---------- timeLimiter success:{}", event))
+                .onError(event -> log.info("---------- timeLimiter error:{}", event))
+                .onTimeout(event -> log.info("---------- rateLimiter timeout:{}", event));
     }
 
     public static void recordResponseToCircuitBreaker(CircuitBreaker circuitBreaker, WebTestClient testClient, String path) {
@@ -199,23 +207,6 @@ public class Resilience4jTestHelper {
         }
     }
 
-    public static String response(WebTestClient testClient, String path) {
-        WebTestClient.ResponseSpec responseSpec = testClient.post().uri(path).exchange();
-        try {
-            responseSpec.expectStatus().is4xxClientError();
-            throw new RuntimeException("<<<<< hit 4XX >>>>>");
-        } catch (Throwable error) {
-        }
-
-        try {
-            responseSpec.expectStatus().is5xxServerError();
-            throw new RuntimeException("<<<<< hit 5XX >>>>>");
-        } catch (Throwable error) {
-        }
-        responseSpec.expectStatus().is2xxSuccessful();
-        return "hit 200";
-    }
-
     public static String responseToCircuitBreaker(CircuitBreaker circuitBreaker, WebTestClient testClient, String path) {
         WebTestClient.ResponseSpec responseSpec = testClient.post().uri(path).exchange();
         try {
@@ -235,12 +226,68 @@ public class Resilience4jTestHelper {
         return "hit 200";
     }
 
-    public static String responseToRetry(CircuitBreaker circuitBreaker, Retry retry, WebTestClient testClient, String path) {
+    public static String responseToBulkhead(Bulkhead bulkhead, WebTestClient testClient, String path) {
+        WebTestClient.ResponseSpec responseSpec = testClient.post().uri(path).exchange();
+        if (bulkhead.getMetrics().getAvailableConcurrentCalls() < 1) {
+            throw BulkheadFullException.createBulkheadFullException(bulkhead);
+        }
+        try {
+            responseSpec.expectStatus().is4xxClientError();
+            throw new RuntimeException("<<<<< hit 4XX >>>>>");
+        } catch (Throwable error) {
+        }
+
+        try {
+            responseSpec.expectStatus().is5xxServerError();
+            throw new RuntimeException("<<<<< hit 5XX >>>>>");
+        } catch (Throwable error) {
+        }
+        responseSpec.expectStatus().is2xxSuccessful();
+        return "hit 200";
+    }
+
+    public static String responseToRetry(WebTestClient testClient, String path) {
+        WebTestClient.ResponseSpec responseSpec = testClient.post().uri(path).exchange();
+        try {
+            responseSpec.expectStatus().is4xxClientError();
+            return "HIT_ERROR_4XX";
+        } catch (Throwable error) {
+        }
+        try {
+            responseSpec.expectStatus().is5xxServerError();
+            return "HIT_ERROR_5XX";
+        } catch (Throwable error) {
+        }
+        responseSpec.expectStatus().is2xxSuccessful();
+        return "HIT_200";
+    }
+
+    public static String responseToRateLimiter(RateLimiter rateLimiter, WebTestClient testClient, String path) {
+        WebTestClient.ResponseSpec responseSpec = testClient.post().uri(path).exchange();
+        try {
+            responseSpec.expectStatus().is4xxClientError();
+            rateLimiter.onError(new RuntimeException("<<<<< hit 4XX >>>>>"));
+            throw new RuntimeException("<<<<< hit 4XX >>>>>");
+        } catch (Throwable error) {
+        }
+
+        try {
+            responseSpec.expectStatus().is5xxServerError();
+            rateLimiter.onError(new RuntimeException("<<<<< hit 5XX >>>>>"));
+            throw new RuntimeException("<<<<< hit 5XX >>>>>");
+        } catch (Throwable error) {
+        }
+        responseSpec.expectStatus().is2xxSuccessful();
+        rateLimiter.onSuccess();
+        return "hit 200";
+    }
+
+    public static String responseToTimeLimiter(TimeLimiter timeLimiter, CircuitBreaker circuitBreaker, WebTestClient testClient, String path) {
         WebTestClient.ResponseSpec responseSpec = testClient.post().uri(path).exchange();
         try {
             responseSpec.expectStatus().is4xxClientError();
             circuitBreaker.onError(0, TimeUnit.MILLISECONDS, new RuntimeException("<<<<< hit 4XX >>>>>"));
-            retry.context().onError(new RuntimeException("<<<<< hit 4XX >>>>>"));
+            timeLimiter.onError(new RuntimeException("<<<<< hit 4XX >>>>>"));
             throw new RuntimeException("<<<<< hit 4XX >>>>>");
         } catch (Throwable error) {
         }
@@ -248,13 +295,12 @@ public class Resilience4jTestHelper {
         try {
             responseSpec.expectStatus().is5xxServerError();
             circuitBreaker.onError(0, TimeUnit.MILLISECONDS, new RuntimeException("<<<<< hit 5XX >>>>>"));
-            retry.context().onRuntimeError(new RuntimeException("<<<<< hit 5XX >>>>>"));
+            timeLimiter.onError(new RuntimeException("<<<<< hit 5XX >>>>>"));
             throw new RuntimeException("<<<<< hit 5XX >>>>>");
         } catch (Throwable error) {
         }
         responseSpec.expectStatus().is2xxSuccessful();
-        circuitBreaker.onSuccess(0, TimeUnit.MILLISECONDS);
-        retry.context().onComplete();
+        timeLimiter.onSuccess();
         return "hit 200";
     }
 
