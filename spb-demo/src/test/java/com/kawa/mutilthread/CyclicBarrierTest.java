@@ -24,7 +24,7 @@ public class CyclicBarrierTest {
       try {
         int i = 1;
          while( i < 101){
-            new HealtchCheck(cb,i).start();
+            new HealthCheck(cb,i).start();
             i++;
          }
       }catch(final Exception e){} finally{
@@ -33,11 +33,11 @@ public class CyclicBarrierTest {
 }
 
 @Slf4j
-class HealtchCheck extends Thread {
+class HealthCheck extends Thread {
    private final CyclicBarrier  cyclicBarrier;
    private final int  no;
 
-   public HealtchCheck(final CyclicBarrier  cyclicBarrier,final int no){
+   public HealthCheck(final CyclicBarrier  cyclicBarrier,final int no){
          this.cyclicBarrier = cyclicBarrier;
          this.no = no;
    }
