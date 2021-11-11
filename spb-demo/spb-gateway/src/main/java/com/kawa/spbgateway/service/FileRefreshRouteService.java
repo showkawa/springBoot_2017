@@ -26,7 +26,7 @@ public class FileRefreshRouteService implements ApplicationEventPublisherAware, 
         this.applicationEventPublisher = applicationEventPublisher;
     }
 
-    @Scheduled(cron = "0/5 * * * * ?")
+    @Scheduled(cron = "* 0/30 * * * ?")
     private void autoRefresh() {
         refreshRoute();
     }

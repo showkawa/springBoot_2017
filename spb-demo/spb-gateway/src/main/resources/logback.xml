@@ -6,14 +6,14 @@
         <encoder charset="UTF-8">
             <pattern>
                 <!--                {-->
-                <!--                    id: %X{gid},-->
+                <!--                    id: %X{x-request-id},-->
                 <!--                    level: %-5level,-->
                 <!--                    thread: %thread,-->
                 <!--                    date: %d{yyyy-MM-dd HH:mm:ss.SSS},-->
                 <!--                    logger: %logger{36},-->
                 <!--                    msg: %msg-->
                 <!--                }%n-->
-                %-5level %X{gid} [%thread] %d{yyyy-MM-dd HH:mm:ss.SSS} %green(%logger{36}) - %magenta(%msg%n)
+                %-5level %X{x-request-region} %X{x-request-id} [%thread] %d{yyyy-MM-dd HH:mm:ss.SSS} %green(%logger{36}) - %magenta(%msg%n)
             </pattern>
         </encoder>
     </appender>
