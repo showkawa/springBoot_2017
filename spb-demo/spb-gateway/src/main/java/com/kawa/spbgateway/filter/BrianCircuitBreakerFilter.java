@@ -31,7 +31,7 @@ import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.*
 
 @Slf4j
 @Component
-public class CircuitBreakerFilter implements GlobalFilter, Ordered {
+public class BrianCircuitBreakerFilter implements GlobalFilter, Ordered {
 
     @Autowired
     private ReactiveCircuitBreakerFactory reactiveCircuitBreakerFactory;
@@ -49,7 +49,7 @@ public class CircuitBreakerFilter implements GlobalFilter, Ordered {
 //    private URI defaultFallbackUri = URI.create("http://localhost:8080");
     private URI defaultFallbackUri = null;
 
-    public CircuitBreakerFilter() {
+    public BrianCircuitBreakerFilter() {
     }
 
 
