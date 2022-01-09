@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Configuration;
 import java.io.IOException;
 import java.time.Duration;
 
-@Configuration
+//@Configuration
 public class ReactiveResilience4JCircuitBreakerFactoryConfiguration {
 
     @Bean("reactiveCircuitBreakerFactory")
