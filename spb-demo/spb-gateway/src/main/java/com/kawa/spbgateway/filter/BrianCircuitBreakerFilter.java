@@ -30,7 +30,7 @@ import static java.util.Optional.ofNullable;
 import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.*;
 
 @Slf4j
-@Component
+//@Component
 public class BrianCircuitBreakerFilter implements GlobalFilter, Ordered {
 
     @Autowired
