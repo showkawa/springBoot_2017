@@ -77,12 +77,12 @@ public class Function_ {
         return func.apply(input);
     }
 
-    // compose
+    //call compose() before apply()
     public int convert2(int input, Function<Integer, Integer> f1, Function<Integer, Integer> f2) {
         return f1.compose(f2).apply(input);
     }
 
-    // andThen
+    // call andThen() after apply()
     public int convert3(int input, Function<Integer, Integer> f1, Function<Integer, Integer> f2) {
         return f1.andThen(f2).apply(input);
     }
