@@ -18,6 +18,7 @@
 		<module>spb-feign</module>
 		<module>spb-mq</module>
 		<module>spb-gateway</module>
+		<module>spb-script</module>
 	</modules>
 
 	<parent>
