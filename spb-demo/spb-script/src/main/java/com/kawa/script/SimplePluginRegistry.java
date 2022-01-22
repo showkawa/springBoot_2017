@@ -11,20 +11,17 @@ public class SimplePluginRegistry<T extends Plugin<S>, S> implements PluginRegis
     private List<T> plugins;
     private boolean initialized;
 
-    private SimplePluginRegistry(List<? extends T> plugins) {
+    protected SimplePluginRegistry(List<? extends T> plugins) {
         Assert.notNull(plugins, "Plugins must not be null!");
-
         this.plugins = plugins == null ? new ArrayList<>() : (List<T>) plugins;
         this.initialized = false;
     }
 
     public List<T> getPlugins() {
-
         if (!initialized) {
             this.plugins = initialize(this.plugins);
             this.initialized = true;
         }
-
         return plugins;
     }
 

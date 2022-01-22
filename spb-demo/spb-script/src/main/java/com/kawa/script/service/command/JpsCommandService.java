@@ -15,6 +15,6 @@ public class JpsCommandService implements CommandPlugin {
 
     @Override
     public boolean supports(String s) {
-        return false;
+        return s.equals("jps");
     }
 }

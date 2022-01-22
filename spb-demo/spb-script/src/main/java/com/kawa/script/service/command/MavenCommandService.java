@@ -1,6 +1,7 @@
 package com.kawa.script.service.command;
 
 import com.kawa.script.BrianScriptApplication;
+import com.kawa.script.plugin.CommandPlugin;
 import com.kawa.script.plugin.ToolPlugin;
 import org.apache.maven.shared.invoker.*;
 import org.slf4j.Logger;
@@ -10,12 +11,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 
-public class MavenCommandService implements ToolPlugin {
+public class MavenCommandService implements CommandPlugin {
 
     private static final Logger log = LoggerFactory.getLogger(MavenCommandService.class);
 
     @Override
-    public void start(String envPath) {
+    public void run(String envPath) {
         ClassLoader classLoader = BrianScriptApplication.class.getClassLoader();
         String classPath = classLoader.getResource("").getPath();
         Path path = Paths.get(classPath.replace("/target/classes/", "/pom.xml"));
@@ -40,6 +41,6 @@ public class MavenCommandService implements ToolPlugin {
 
     @Override
     public boolean supports(String s) {
-        return false;
+        return s.equals("maven");
     }
 }

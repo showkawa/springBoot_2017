@@ -1,6 +1,6 @@
 package com.kawa.script.service.command;
 
-import com.kawa.script.plugin.ToolPlugin;
+import com.kawa.script.plugin.CommandPlugin;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListBranchCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -13,12 +13,12 @@ import java.io.File;
 import java.io.IOException;
 
 
-public class GitCommandService implements ToolPlugin {
+public class GitCommandService implements CommandPlugin {
 
     private static final Logger log = LoggerFactory.getLogger(GitCommandService.class);
 
     @Override
-    public void start(String envPath) {
+    public void run(String envPath) {
         FileRepositoryBuilder builder = new FileRepositoryBuilder();
         Repository repository = null;
         try {
@@ -41,6 +41,6 @@ public class GitCommandService implements ToolPlugin {
 
     @Override
     public boolean supports(String s) {
-        return false;
+        return s.equals("git");
     }
 }
