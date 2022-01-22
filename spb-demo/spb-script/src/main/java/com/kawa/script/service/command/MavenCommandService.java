@@ -16,7 +16,7 @@ public class MavenCommandService implements CommandPlugin {
     private static final Logger log = LoggerFactory.getLogger(MavenCommandService.class);
 
     @Override
-    public void run(String envPath) {
+    public void run(String parma) {
         ClassLoader classLoader = BrianScriptApplication.class.getClassLoader();
         String classPath = classLoader.getResource("").getPath();
         Path path = Paths.get(classPath.replace("/target/classes/", "/pom.xml"));

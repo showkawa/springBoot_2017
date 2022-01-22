@@ -18,7 +18,7 @@ public class GitCommandService implements CommandPlugin {
     private static final Logger log = LoggerFactory.getLogger(GitCommandService.class);
 
     @Override
-    public void run(String envPath) {
+    public void run(String parma) {
         FileRepositoryBuilder builder = new FileRepositoryBuilder();
         Repository repository = null;
         try {

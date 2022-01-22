@@ -9,8 +9,8 @@ public class JpsCommandService implements CommandPlugin {
     private static final Logger log = LoggerFactory.getLogger(JpsCommandService.class);
 
     @Override
-    public void run(String command) {
-        log.info("-------------------------------------");
+    public void run(String parma) {
+        log.info("parma:{}", parma);
     }
 
     @Override
