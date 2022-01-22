@@ -1,54 +1,66 @@
 package com.kawa.script;
 
-import org.apache.maven.shared.invoker.*;
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.ListBranchCommand;
-import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
+import com.kawa.script.service.command.GitCommandService;
+import com.kawa.script.service.command.JpsCommandService;
+import com.kawa.script.service.command.MavenCommandService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Collections;
+import org.springframework.util.StringUtils;
 
 
 public class BrianScriptApplication {
 
     private static final Logger log = LoggerFactory.getLogger(BrianScriptApplication.class);
+    static JpsCommandService jpsCommandService;
+    static MavenCommandService mavenCommandService;
+    static GitCommandService gitCommandService;
 
-    public static void main(String[] args) throws MavenInvocationException, IOException, GitAPIException {
-        log.info("====================BrianScriptApplication Start====================");
-        Arrays.stream(args).forEach(param -> log.info(">>>>>>>>>> run params: {}", param));
-        ClassLoader classLoader = BrianScriptApplication.class.getClassLoader();
-        String classPath = classLoader.getResource("").getPath();
-        Path path = Paths.get(classPath.replace("/target/classes/", "/pom.xml"));
-        InvocationRequest invocationRequest = new DefaultInvocationRequest();
-        invocationRequest.setPomFile(path.toFile());
-        invocationRequest.setGoals(Collections.singletonList("test"));
-        InvocationResult result = new DefaultInvoker()
-                .setMavenHome(Paths.get("/usr/share/maven").toFile())
-                .execute(invocationRequest);
-        int exitCode = result.getExitCode();
-        if (exitCode != 0) {
-            log.info(">>>>>>>>>>> maven run command hit error <<<<<<<<<<");
+    public static void main(String[] args) {
+        if (args == null || args.length <= 0) {
+            log.info(">>>>>>>>> no args, exit!!!");
+            return;
+        }
+        String value = null;
+        String command = args[0];
+        if (args.length > 1) {
+            value = args[1];
+        }
+        loadPlugin();
+
+        if (StringUtils.uncapitalize(jpsCommandService.getClass().getSimpleName()).startsWith(command)) {
+            log.info(">>>>>>>>>> jps command <<<<<<<<<<");
+            return;
         }
 
-        log.info(result.toString());
+        if (StringUtils.uncapitalize(mavenCommandService.getClass().getSimpleName()).startsWith(command)) {
+            log.info(">>>>>>>>>> maven command <<<<<<<<<<");
+            return;
+        }
 
-        FileRepositoryBuilder builder = new FileRepositoryBuilder();
-        Repository repository = builder.setGitDir(new File("/home/un/code/jvm-tools/.git"))
-                .readEnvironment() // scan environment GIT_* variables
-                .findGitDir() // scan up the file system tree
-                .build();
+        if (StringUtils.uncapitalize(gitCommandService.getClass().getSimpleName()).startsWith(command)) {
+            log.info(">>>>>>>>>> git command <<<<<<<<<<");
+            return;
+        }
 
-        Git git = new Git(repository);
-        ListBranchCommand listBranchCommand = git.branchList();
-        listBranchCommand.call().forEach(System.out::println);
+//        String commandClassName = "com.kawa.script.service.command." + StringUtils.capitalize(command) + "CommandService";
+//        ClassLoader classLoader = Thread.currentThread().getClass().getClassLoader();
+//        if (classLoader == null){
+//            classLoader = new BrianScriptApplication().getClass().getClassLoader();
+//        }
+//            try {
+//                Class<?> commandPlugin = classLoader.loadClass(commandClassName);
+//                Method method = commandPlugin.getMethod("run", String.class);
+//                method.invoke(CommandPlugin.class, value);
+//            } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+//                e.printStackTrace();
+//            }
+    }
+
+    private static void loadPlugin() {
+        jpsCommandService = new JpsCommandService();
+        mavenCommandService = new MavenCommandService();
+        gitCommandService = new GitCommandService();
+
     }
 
 }
