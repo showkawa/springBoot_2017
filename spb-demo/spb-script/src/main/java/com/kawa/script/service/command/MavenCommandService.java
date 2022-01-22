@@ -2,7 +2,6 @@ package com.kawa.script.service.command;
 
 import com.kawa.script.BrianScriptApplication;
 import com.kawa.script.plugin.CommandPlugin;
-import com.kawa.script.plugin.ToolPlugin;
 import org.apache.maven.shared.invoker.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,12 +16,13 @@ public class MavenCommandService implements CommandPlugin {
 
     @Override
     public void run(String parma) {
+        log.info("parma:{}", parma);
         ClassLoader classLoader = BrianScriptApplication.class.getClassLoader();
         String classPath = classLoader.getResource("").getPath();
         Path path = Paths.get(classPath.replace("/target/classes/", "/pom.xml"));
         InvocationRequest invocationRequest = new DefaultInvocationRequest();
         invocationRequest.setPomFile(path.toFile());
-        invocationRequest.setGoals(Collections.singletonList("test"));
+        invocationRequest.setGoals(Collections.singletonList(parma));
         InvocationResult result = null;
         try {
             result = new DefaultInvoker()
@@ -35,7 +35,6 @@ public class MavenCommandService implements CommandPlugin {
         if (exitCode != 0) {
             log.info(">>>>>>>>>>> maven run command hit error <<<<<<<<<<");
         }
-
         log.info(result.toString());
     }
 
