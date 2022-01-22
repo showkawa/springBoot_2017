@@ -17,7 +17,7 @@ public class MavenCommandService implements CommandPlugin {
     @Override
     public void run(String parma) {
         log.info("parma:{}", parma);
-        ClassLoader classLoader = BrianScriptApplication.class.getClassLoader();
+        ClassLoader classLoader = MavenCommandService.class.getClassLoader();
         String classPath = classLoader.getResource("").getPath();
         Path path = Paths.get(classPath.replace("/target/classes/", "/pom.xml"));
         InvocationRequest invocationRequest = new DefaultInvocationRequest();
