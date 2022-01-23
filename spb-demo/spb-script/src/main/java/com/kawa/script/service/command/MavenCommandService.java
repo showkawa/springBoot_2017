@@ -1,6 +1,5 @@
 package com.kawa.script.service.command;
 
-import com.kawa.script.BrianScriptApplication;
 import com.kawa.script.plugin.CommandPlugin;
 import org.apache.maven.shared.invoker.*;
 import org.slf4j.Logger;

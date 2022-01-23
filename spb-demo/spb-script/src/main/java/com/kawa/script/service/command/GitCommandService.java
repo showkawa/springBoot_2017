@@ -23,8 +23,8 @@ public class GitCommandService implements CommandPlugin {
         Repository repository = null;
         try {
             repository = builder.setGitDir(new File("/home/un/code/jvm-tools/.git"))
-                    .readEnvironment() // scan environment GIT_* variables
-                    .findGitDir() // scan up the file system tree
+                    .readEnvironment()
+                    .findGitDir()
                     .build();
         } catch (IOException e) {
             e.printStackTrace();
@@ -43,4 +43,5 @@ public class GitCommandService implements CommandPlugin {
     public boolean supports(String s) {
         return s.equals("git");
     }
+
 }
