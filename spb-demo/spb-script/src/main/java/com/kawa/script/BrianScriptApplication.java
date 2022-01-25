@@ -1,6 +1,7 @@
 package com.kawa.script;
 
 import com.kawa.script.plugin.CommandPlugin;
+import com.kawa.script.service.command.ClassCommandService;
 import com.kawa.script.service.command.GitCommandService;
 import com.kawa.script.service.command.JpsCommandService;
 import com.kawa.script.service.command.MavenCommandService;
@@ -19,7 +20,8 @@ public class BrianScriptApplication {
 
     static {
         simplePluginRegistry = new SimplePluginRegistry<>(Arrays.asList(
-                new JpsCommandService(), new MavenCommandService(), new GitCommandService()));
+                new JpsCommandService(), new MavenCommandService(),
+                new GitCommandService(), new ClassCommandService()));
     }
 
     public static void main(String[] args) {

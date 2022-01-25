@@ -15,6 +15,6 @@ public class ClassCommandService implements CommandPlugin {
 
     @Override
     public void run(String param) {
-       log.info(">>>>>>>>>> ClassCommandService param");
+        log.info(">>>>>>>>>> ClassCommandService param: {}", param);
     }
 }
