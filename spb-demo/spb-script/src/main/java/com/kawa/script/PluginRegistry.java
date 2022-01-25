@@ -7,7 +7,6 @@ import java.util.Optional;
 
 public interface PluginRegistry<T extends Plugin<S>, S> extends Iterable<T> {
 
-
     public static <S, T extends Plugin<S>> PluginRegistry<T, S> empty() {
         return of(Collections.emptyList());
     }

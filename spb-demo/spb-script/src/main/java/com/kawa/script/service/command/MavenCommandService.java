@@ -14,14 +14,14 @@ public class MavenCommandService implements CommandPlugin {
     private static final Logger log = LoggerFactory.getLogger(MavenCommandService.class);
 
     @Override
-    public void run(String parma) {
-        log.info("parma:{}", parma);
+    public void run(String param) {
+        log.info("param:{}", param);
         ClassLoader classLoader = MavenCommandService.class.getClassLoader();
         String classPath = classLoader.getResource("").getPath();
         Path path = Paths.get(classPath.replace("/target/classes/", "/pom.xml"));
         InvocationRequest invocationRequest = new DefaultInvocationRequest();
         invocationRequest.setPomFile(path.toFile());
-        invocationRequest.setGoals(Collections.singletonList(parma));
+        invocationRequest.setGoals(Collections.singletonList(param));
         InvocationResult result = null;
         try {
             result = new DefaultInvoker()
