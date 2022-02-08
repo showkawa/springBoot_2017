@@ -1,6 +1,7 @@
 package com.kawa.script.service.command;
 
 import com.kawa.script.plugin.CommandPlugin;
+import com.kawa.script.service.tool.CommandLauncher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,5 +17,6 @@ public class ClassCommandService implements CommandPlugin {
     @Override
     public void run(String param) {
         log.info(">>>>>>>>>> ClassCommandService param: {}", param);
+        new CommandLauncher().start(new String[]{"class", param});
     }
 }
