@@ -14,6 +14,9 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class FlowTest {
 
+    /**
+     * Publisher to Subscriber (PS)
+     */
     @Test
     public void Flow_Test_Subscriber() {
 
@@ -29,6 +32,35 @@ public class FlowTest {
             while (++count <= 1000) {
                 log.info("--- create test item ---: {}", count);
                 publisher.submit(count);
+            }
+        }
+
+        try {
+            TimeUnit.SECONDS.sleep(1);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void Flow_Test_Processor() {
+
+        // create publisher (use jdk publisher)
+        try (SubmissionPublisher<String > publisher = new SubmissionPublisher<>()) {
+            // create processor
+            BrianProcessor processor = new BrianProcessor();
+            // create subscriber
+            BrianSubscriber subscriber = new BrianSubscriber();
+            // create subscription, will call BrianSubscription onSubscribe() method
+            publisher.subscribe(processor);
+            processor.subscribe(subscriber);
+
+
+            // publisher create the test items
+            int count = 0;
+            while (++count <= 1000) {
+                log.info("--- create test item ---: {}", count);
+                publisher.submit(String.valueOf(count)+"%3D");
             }
         }
 
