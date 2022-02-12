@@ -41,6 +41,7 @@ public class BrianSubscriber implements Flow.Subscriber<Integer> {
 //        } catch (InterruptedException e) {
 //            e.printStackTrace();
 //        }
+        // when consume 1 item then request next 10 items
         this.subscription.request(10L);
     }
 
