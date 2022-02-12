@@ -42,11 +42,14 @@ public class FlowTest {
         }
     }
 
+    /**
+     * Publisher to Processor to Subscriber (PPS)
+     */
     @Test
     public void Flow_Test_Processor() {
 
         // create publisher (use jdk publisher)
-        try (SubmissionPublisher<String > publisher = new SubmissionPublisher<>()) {
+        try (SubmissionPublisher<String> publisher = new SubmissionPublisher<>()) {
             // create processor
             BrianProcessor processor = new BrianProcessor();
             // create subscriber
@@ -55,12 +58,11 @@ public class FlowTest {
             publisher.subscribe(processor);
             processor.subscribe(subscriber);
 
-
             // publisher create the test items
             int count = 0;
             while (++count <= 1000) {
                 log.info("--- create test item ---: {}", count);
-                publisher.submit(String.valueOf(count)+"%3D");
+                publisher.submit(String.valueOf(count) + "%3D");
             }
         }
 
