@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.sun.org.apache.xerces.internal.impl.Constants;
 import lombok.extern.slf4j.Slf4j;
 import org.hdiv.config.validations.DefaultValidationParser;
 import org.springframework.beans.factory.annotation.Value;
@@ -91,9 +90,9 @@ public class InjectProtectFilter implements GlobalFilter, Ordered {
     private void readValidations(String validationFilePath, DefaultValidationParser parser) {
         try (var fis = new FileInputStream(validationFilePath)) {
             SAXParserFactory spf = SAXParserFactory.newInstance();
-            spf.setFeature(Constants.SAX_FEATURE_PREFIX + Constants.EXTERNAL_GENERAL_ENTITIES_FEATURE, false);
-            spf.setFeature(Constants.SAX_FEATURE_PREFIX + Constants.EXTERNAL_PARAMETER_ENTITIES_FEATURE, false);
-            spf.setFeature(Constants.SAX_FEATURE_PREFIX + Constants.DISALLOW_DOCTYPE_DECL_FEATURE, true);
+            spf.setFeature("http://xml.org/sax/features/external-general-entities", false);
+            spf.setFeature("http://xml.org/sax/features/xternal-parameter-entities", false);
+            spf.setFeature("http://xml.org/sax/features/disallow-doctype-decl", true);
             SAXParser sp = spf.newSAXParser();
             sp.parse(fis, parser);
         } catch (IOException | ParserConfigurationException | SAXException e) {
