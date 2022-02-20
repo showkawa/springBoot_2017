@@ -2,7 +2,7 @@ package com.kawa.spbgateway.service;
 
 
 import com.kawa.spbgateway.domain.Roles;
-import com.kawa.spbgateway.repository.RoleRepository;
+import com.kawa.spbgateway.repository.RolesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -15,12 +15,12 @@ import reactor.core.publisher.Mono;
 public class RolesRouteFunction {
 
     @Autowired
-    private RoleRepository repository;
+    private RolesRepository rolesRepository;
 
     public Mono<ServerResponse> findAllRoles(ServerRequest request) {
         return ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(repository.findAll(), Roles.class);
+                .body(rolesRepository.findAll(), Roles.class);
     }
 
 }
