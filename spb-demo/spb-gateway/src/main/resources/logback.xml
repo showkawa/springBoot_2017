@@ -37,7 +37,7 @@
             additivity="false">
         <appender-ref ref="BRIANHUANG"/>
     </logger>
-    <root level="DEBUG">
+    <root level="INFO">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="BRIANHUANG"/>
     </root>
