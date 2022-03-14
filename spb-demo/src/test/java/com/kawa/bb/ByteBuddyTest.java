@@ -62,14 +62,14 @@ public class ByteBuddyTest {
 
 
     /**
-     * overwrite the method
+     * overwrite the method by subclass
      */
     @Test
     public void Overwrite_Method() {
         try {
             UserService userService = new ByteBuddy()
-                    .redefine(UserService.class)
-                    .method(named("getIdNumber").and(takesArguments(1)).and(returns(String.class)))
+                    .subclass(UserService.class)
+                    .method(named("getIdNumber").and(returns(String.class)))
                     .intercept(to(OvUserService.class))
                     .make().load(getClass().getClassLoader())
                     .getLoaded()
