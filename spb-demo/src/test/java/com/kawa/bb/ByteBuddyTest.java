@@ -63,6 +63,9 @@ public class ByteBuddyTest {
 
     /**
      * overwrite the method by subclass
+     * if hit below error, need update delegate method to static method
+     * None of [] allows for delegation from XXXXXXXX
+     *
      */
     @Test
     public void Overwrite_Method() {
