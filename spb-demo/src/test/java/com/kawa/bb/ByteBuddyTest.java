@@ -22,7 +22,7 @@ import static org.hamcrest.Matchers.equalTo;
 public class ByteBuddyTest {
 
     /**
-     * overwrite the method return value
+     * overwrite the method return fixed value
      * for com.kawa.mock.UserService#getAge(java.lang.String)
      */
     @Test
@@ -41,6 +41,31 @@ public class ByteBuddyTest {
             int age = bbUserService.getAge("");
             log.info(">>>>age:{}", age);
             assertThat(age, equalTo(18));
+        } catch (InstantiationException | IllegalAccessException |
+                InvocationTargetException | NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * overwrite the method by subclass
+     * if hit below error, need update delegate method to static method
+     * None of [] allows for delegation from XXXXXXXX
+     */
+    @Test
+    public void Overwrite_Method() {
+        try {
+            UserService userService = new ByteBuddy()
+                    .subclass(UserService.class)
+                    .method(named("getIdNumber").and(returns(String.class)))
+                    .intercept(to(OvUserService.class))
+                    .make().load(getClass().getClassLoader())
+                    .getLoaded()
+                    .getDeclaredConstructor()
+                    .newInstance();
+
+            String idNum = userService.getIdNumber("sean");
+            log.info("idNum:{}", idNum);
         } catch (InstantiationException | IllegalAccessException |
                 InvocationTargetException | NoSuchMethodException e) {
             e.printStackTrace();
@@ -84,29 +109,5 @@ public class ByteBuddyTest {
         }
     }
 
-
-    /**
-     * overwrite the method by subclass
-     * if hit below error, need update delegate method to static method
-     * None of [] allows for delegation from XXXXXXXX
-     */
-    @Test
-    public void Overwrite_Method() {
-        try {
-            UserService userService = new ByteBuddy()
-                    .subclass(UserService.class)
-                    .method(named("getIdNumber").and(returns(String.class)))
-                    .intercept(to(OvUserService.class))
-                    .make().load(getClass().getClassLoader())
-                    .getLoaded()
-                    .getDeclaredConstructor()
-                    .newInstance();
-
-            String idNum = userService.getIdNumber("sean");
-            log.info("idNum:{}", idNum);
-        } catch (InstantiationException | IllegalAccessException |
-                InvocationTargetException | NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-    }
 }
+
