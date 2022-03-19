@@ -4,6 +4,8 @@ import com.kawa.bb.overwrite.OvUserService;
 import com.kawa.mock.UserService;
 import lombok.extern.slf4j.Slf4j;
 import net.bytebuddy.ByteBuddy;
+import net.bytebuddy.NamingStrategy;
+import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.implementation.FixedValue;
 import org.junit.Test;
 
@@ -60,12 +62,33 @@ public class ByteBuddyTest {
         }
     }
 
+    /**
+     * with(new NamingStrategy.AbstractBase()) and name(String) are the same function
+     */
+    @Test
+    public void Output_ByteCode_With_Name_Strategy() {
+        try {
+            // output the byte code
+            new ByteBuddy()
+                    .with(new NamingStrategy.AbstractBase() {
+                        @Override
+                        protected String name(TypeDescription superClass) {
+                            return "com.kawa.name.stratgy." + superClass.getSimpleName();
+                        }
+                    })
+                    .subclass(UserService.class)
+                    .make()
+                    .saveIn(new File("/home/un/code/springBoot_2017/spb-demo/target/classes"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     /**
      * overwrite the method by subclass
      * if hit below error, need update delegate method to static method
      * None of [] allows for delegation from XXXXXXXX
-     *
      */
     @Test
     public void Overwrite_Method() {
