@@ -2,6 +2,10 @@ package com.kawa.bb.advice;
 
 import net.bytebuddy.asm.Advice;
 
+
+/**
+ * advice enter and exit annotation
+ */
 public class OnMethodEnterExitAdvice {
 
     @Advice.OnMethodEnter

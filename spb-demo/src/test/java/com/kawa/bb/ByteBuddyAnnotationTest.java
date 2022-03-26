@@ -1,6 +1,7 @@
 package com.kawa.bb;
 
 
+import com.kawa.bb.advice.OnMethodEnterAdvice;
 import com.kawa.bb.advice.OnMethodEnterExitAdvice;
 import com.kawa.bb.overwrite.OvUserService;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +38,6 @@ public class ByteBuddyAnnotationTest {
                 .with(AgentBuilder.PoolStrategy.Default.EXTENDED)
                 .with(AgentBuilder.InitializationStrategy.NoOp.INSTANCE)
                 // setup match condition
-                // todo how to skip con constructor()
                 .type(ElementMatchers.is(OvUserService.class), ElementMatchers.is(classLoader))
                 .transform((builder, typeDescription, classLoader, module) ->
                         builder.visit(Advice
@@ -53,15 +53,35 @@ public class ByteBuddyAnnotationTest {
             classType.getDeclaredMethod("getAge", String.class).invoke(newInstance, "sean");
             // call static method
             classType.getMethod("getIdNumber", String.class).invoke(newInstance, "sean");
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException | InvocationTargetException | InstantiationException
+                | IllegalAccessException | NoSuchMethodException e) {
             e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
+        }
+    }
+
+    @Test
+    public void Method_Enter_Advice_With_Condition() {
+        new AgentBuilder.Default()
+                .with(AgentBuilder.PoolStrategy.Default.EXTENDED)
+                .with(AgentBuilder.InitializationStrategy.NoOp.INSTANCE)
+                // setup match condition
+                .type(ElementMatchers.is(OvUserService.class), ElementMatchers.is(classLoader))
+                .transform((builder, typeDescription, classLoader, module) ->
+                        builder.visit(Advice
+                                .to(OnMethodEnterAdvice.class)
+                                .on(ElementMatchers.isMethod()
+                                        .and(ElementMatchers.not(ElementMatchers.isStatic())))))
+                .installOnByteBuddyAgent();
+
+        try {
+            Class<?> classType = classLoader.loadClass(OvUserService.class.getName());
+            Object newInstance = classType.getDeclaredConstructor().newInstance();
+            // call method
+            classType.getDeclaredMethod("getAge", String.class).invoke(newInstance, "sean");
+            // call static method
+            classType.getMethod("getIdNumber", String.class).invoke(newInstance, "sean");
+        } catch (ClassNotFoundException | InvocationTargetException | InstantiationException
+                | IllegalAccessException | NoSuchMethodException e) {
             e.printStackTrace();
         }
     }
