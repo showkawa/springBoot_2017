@@ -6,7 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.NamingStrategy;
 import net.bytebuddy.description.type.TypeDescription;
+import net.bytebuddy.dynamic.ClassFileLocator;
 import net.bytebuddy.implementation.FixedValue;
+import net.bytebuddy.pool.TypePool;
 import org.junit.Test;
 
 import java.io.File;
@@ -105,6 +107,21 @@ public class ByteBuddyTest {
                     .make()
                     .saveIn(new File("/home/un/code/springBoot_2017/spb-demo/target/classes"));
         } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void Add_Field_UseBy_TypePool() {
+        try {
+            TypePool typePool = TypePool.Default.ofSystemLoader();
+            Class<?> changedClass = new ByteBuddy()
+                    .redefine(typePool.describe("com.kawa.bb.overwrite.OvUserService").resolve(), ClassFileLocator.ForClassLoader.ofSystemLoader())
+                    .defineField("address", String.class)
+                    .make()
+                    .load(ClassLoader.getSystemClassLoader()).getLoaded();
+            log.info(String.valueOf(changedClass.getDeclaredField("address")));
+        } catch (NoSuchFieldException e) {
             e.printStackTrace();
         }
     }
