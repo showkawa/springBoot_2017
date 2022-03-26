@@ -14,7 +14,7 @@ public class OvUserService {
 
     public static String getIdNumber(String name) {
         log.info("--call OvUserService getIdNumber--");
-        return UUID.randomUUID().toString().replace("-", "");
+        return String.format("%s - %s", UUID.randomUUID().toString().replace("-", ""), name);
     }
 
 }
