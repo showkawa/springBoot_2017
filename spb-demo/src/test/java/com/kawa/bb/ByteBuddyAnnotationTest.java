@@ -2,6 +2,7 @@ package com.kawa.bb;
 
 
 import com.kawa.bb.advice.OnMethodEnterAdvice;
+import com.kawa.bb.advice.OnMethodEnterAdviceWithArgs;
 import com.kawa.bb.advice.OnMethodEnterExitAdvice;
 import com.kawa.bb.overwrite.OvUserService;
 import lombok.extern.slf4j.Slf4j;
@@ -80,6 +81,34 @@ public class ByteBuddyAnnotationTest {
             classType.getDeclaredMethod("getAge", String.class).invoke(newInstance, "sean");
             // call static method
             classType.getMethod("getIdNumber", String.class).invoke(newInstance, "sean");
+        } catch (ClassNotFoundException | InvocationTargetException | InstantiationException
+                | IllegalAccessException | NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void Method_Enter_Advice_With_AllArguments() {
+        new AgentBuilder.Default()
+                .with(AgentBuilder.PoolStrategy.Default.EXTENDED)
+                .with(AgentBuilder.InitializationStrategy.NoOp.INSTANCE)
+                // setup match condition
+                .type(ElementMatchers.is(OvUserService.class), ElementMatchers.is(classLoader))
+                .transform((builder, typeDescription, classLoader, module) ->
+                        builder.visit(Advice
+                                .to(OnMethodEnterAdviceWithArgs.class)
+                                .on(ElementMatchers.isMethod().and(ElementMatchers.isPublic()))))
+//                                .on(ElementMatchers.nameStartsWith(""))))
+//                                .on(ElementMatchers.named("getAge"))))
+                .installOnByteBuddyAgent();
+
+        try {
+            Class<?> classType = classLoader.loadClass(OvUserService.class.getName());
+            Object newInstance = classType.getDeclaredConstructor().newInstance();
+            // call method
+            classType.getDeclaredMethod("getAge", String.class).invoke(newInstance, "sean age");
+            // call static method
+            classType.getMethod("getIdNumber", String.class).invoke(newInstance, "sean id");
         } catch (ClassNotFoundException | InvocationTargetException | InstantiationException
                 | IllegalAccessException | NoSuchMethodException e) {
             e.printStackTrace();
