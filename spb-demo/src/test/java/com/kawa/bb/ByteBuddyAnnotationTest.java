@@ -1,9 +1,8 @@
 package com.kawa.bb;
 
 
-import com.kawa.bb.advice.OnMethodEnterAdvice;
-import com.kawa.bb.advice.OnMethodEnterAdviceWithArgs;
-import com.kawa.bb.advice.OnMethodEnterExitAdvice;
+import com.kawa.bb.advice.*;
+import com.kawa.bb.overwrite.BrianService;
 import com.kawa.bb.overwrite.OvUserService;
 import lombok.extern.slf4j.Slf4j;
 import net.bytebuddy.agent.ByteBuddyAgent;
@@ -15,19 +14,18 @@ import net.bytebuddy.matcher.ElementMatchers;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 @Slf4j
 public class ByteBuddyAnnotationTest {
 
     ClassLoader classLoader;
-    Class[] objClasses;
 
     @Before
     public void setup() {
-        objClasses = new Class[]{OvUserService.class};
         classLoader = new ByteArrayClassLoader
-                .ChildFirst(getClass().getClassLoader(), ClassFileLocator.ForClassLoader.readToNames(objClasses),
+                .ChildFirst(getClass().getClassLoader(), ClassFileLocator.ForClassLoader.readToNames(BrianService.class),
                 ByteArrayClassLoader.PersistenceHandler.MANIFEST);
 
         ByteBuddyAgent.install();
@@ -52,7 +50,6 @@ public class ByteBuddyAnnotationTest {
             Object newInstance = classType.getDeclaredConstructor().newInstance();
             // call method
             classType.getDeclaredMethod("getAge", String.class).invoke(newInstance, "sean");
-            // call static method
             classType.getMethod("getIdNumber", String.class).invoke(newInstance, "sean");
         } catch (ClassNotFoundException | InvocationTargetException | InstantiationException
                 | IllegalAccessException | NoSuchMethodException e) {
@@ -79,7 +76,6 @@ public class ByteBuddyAnnotationTest {
             Object newInstance = classType.getDeclaredConstructor().newInstance();
             // call method
             classType.getDeclaredMethod("getAge", String.class).invoke(newInstance, "sean");
-            // call static method
             classType.getMethod("getIdNumber", String.class).invoke(newInstance, "sean");
         } catch (ClassNotFoundException | InvocationTargetException | InstantiationException
                 | IllegalAccessException | NoSuchMethodException e) {
@@ -107,8 +103,58 @@ public class ByteBuddyAnnotationTest {
             Object newInstance = classType.getDeclaredConstructor().newInstance();
             // call method
             classType.getDeclaredMethod("getAge", String.class).invoke(newInstance, "sean age");
-            // call static method
             classType.getMethod("getIdNumber", String.class).invoke(newInstance, "sean id");
+        } catch (ClassNotFoundException | InvocationTargetException | InstantiationException
+                | IllegalAccessException | NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void Method_Enter_Advice_With_Return() {
+        new AgentBuilder.Default()
+                .with(AgentBuilder.PoolStrategy.Default.EXTENDED)
+                .with(AgentBuilder.InitializationStrategy.NoOp.INSTANCE)
+                // setup match condition
+                .type(ElementMatchers.is(OvUserService.class), ElementMatchers.is(classLoader))
+                .transform((builder, typeDescription, classLoader, module) ->
+                        builder.visit(Advice
+                                .to(OnMethodExitReturnAdvice.class)
+                                .on(ElementMatchers.isMethod().and(ElementMatchers.isPublic()))))
+                .installOnByteBuddyAgent();
+
+        try {
+            Class<?> classType = classLoader.loadClass(OvUserService.class.getName());
+            Object newInstance = classType.getDeclaredConstructor().newInstance();
+            // call method
+            classType.getDeclaredMethod("getAge", String.class).invoke(newInstance, "sean age");
+            classType.getMethod("getIdNumber", String.class).invoke(newInstance, "sean id");
+        } catch (ClassNotFoundException | InvocationTargetException | InstantiationException
+                | IllegalAccessException | NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void Method_Enter_Advice_With_FiledValue() {
+        new AgentBuilder.Default()
+                .with(AgentBuilder.PoolStrategy.Default.EXTENDED)
+                .with(AgentBuilder.InitializationStrategy.NoOp.INSTANCE)
+                // setup match condition
+                .type(ElementMatchers.is(BrianService.class), ElementMatchers.is(classLoader))
+                .transform((builder, typeDescription, classLoader, module) ->
+                        builder.visit(Advice
+                                .to(OnMethodEnterFieldAdvice.class)
+                                .on(ElementMatchers.isMethod().and(ElementMatchers.isPublic()))))
+                .installOnByteBuddyAgent();
+
+        try {
+            Class<?> classType = classLoader.loadClass(BrianService.class.getName());
+//            Object newInstance = classType.getDeclaredConstructor(OvUserService.class).setAccessible(true)
+            Constructor<?> declaredConstructor = classType.getDeclaredConstructor(OvUserService.class);
+            Object newInstance = declaredConstructor.newInstance(new OvUserService());
+            // call method
+            classType.getDeclaredMethod("testUs", boolean.class).invoke(newInstance, false);
         } catch (ClassNotFoundException | InvocationTargetException | InstantiationException
                 | IllegalAccessException | NoSuchMethodException e) {
             e.printStackTrace();
