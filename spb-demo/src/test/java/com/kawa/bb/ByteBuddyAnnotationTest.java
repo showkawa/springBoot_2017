@@ -162,5 +162,30 @@ public class ByteBuddyAnnotationTest {
         }
     }
 
+    @Test
+    public void Method_Enter_Advice_With_Origin() {
+        new AgentBuilder.Default()
+                .with(AgentBuilder.PoolStrategy.Default.EXTENDED)
+                .with(AgentBuilder.InitializationStrategy.NoOp.INSTANCE)
+                // setup match condition
+                .type(ElementMatchers.is(BrianService.class), ElementMatchers.is(classLoader))
+                .transform((builder, typeDescription, classLoader, module) ->
+                        builder.visit(Advice
+                                .to(OnMethodEnterOriginAdvice.class)
+                                .on(ElementMatchers.isMethod().and(ElementMatchers.isPublic()))))
+                .installOnByteBuddyAgent();
+
+        try {
+            Class<?> classType = classLoader.loadClass(BrianService.class.getName());
+            Constructor<?> declaredConstructor = classType.getDeclaredConstructor();
+            Object newInstance = declaredConstructor.newInstance();
+            // call method
+            classType.getDeclaredMethod("testUs", boolean.class).invoke(newInstance, false);
+        } catch (ClassNotFoundException | InvocationTargetException | InstantiationException
+                | IllegalAccessException | NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 }
