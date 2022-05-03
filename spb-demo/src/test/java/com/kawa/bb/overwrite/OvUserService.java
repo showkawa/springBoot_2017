@@ -12,7 +12,7 @@ public class OvUserService {
         return 99;
     }
 
-    public String getIdNumber(String name) {
+    public static String getIdNumber(String name) {
         log.info("--call OvUserService getIdNumber--");
         return String.format("%s - %s", UUID.randomUUID().toString().replace("-", ""), name);
     }

@@ -6,9 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.NamingStrategy;
 import net.bytebuddy.description.type.TypeDescription;
-import net.bytebuddy.dynamic.ClassFileLocator;
 import net.bytebuddy.implementation.FixedValue;
-import net.bytebuddy.pool.TypePool;
 import org.junit.Test;
 
 import java.io.File;
@@ -42,9 +40,9 @@ public class ByteBuddyTest {
 
             int age = bbUserService.getAge("");
             log.info(">>>>age:{}", age);
-            assertThat(age, equalTo(18));
+            assertThat(age, equalTo(999));
         } catch (InstantiationException | IllegalAccessException |
-                InvocationTargetException | NoSuchMethodException e) {
+                 InvocationTargetException | NoSuchMethodException e) {
             e.printStackTrace();
         }
     }
@@ -69,7 +67,7 @@ public class ByteBuddyTest {
             String idNum = userService.getIdNumber("sean");
             log.info("idNum:{}", idNum);
         } catch (InstantiationException | IllegalAccessException |
-                InvocationTargetException | NoSuchMethodException e) {
+                 InvocationTargetException | NoSuchMethodException e) {
             e.printStackTrace();
         }
     }
@@ -112,17 +110,18 @@ public class ByteBuddyTest {
     }
 
     @Test
-    public void Add_Field_UseBy_TypePool() {
+    public void Add_Field() {
         try {
-            TypePool typePool = TypePool.Default.ofSystemLoader();
-            Class<?> changedClass = new ByteBuddy()
-                    .redefine(typePool.describe("com.kawa.bb.overwrite.OvUserService").resolve(), ClassFileLocator.ForClassLoader.ofSystemLoader())
+            new ByteBuddy()
+                    .subclass(UserService.class)
+                    .name("com.kawa.mock.UserServiceMock")
                     .defineField("address", String.class)
+//                    .defineMethod("updateAddress",String.class)
                     .make()
-                    .load(ClassLoader.getSystemClassLoader()).getLoaded();
-            log.info(String.valueOf(changedClass.getDeclaredField("address")));
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
+                    .saveIn(new File("/home/un/code/springBoot_2017/spb-demo/target/classes"));
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
