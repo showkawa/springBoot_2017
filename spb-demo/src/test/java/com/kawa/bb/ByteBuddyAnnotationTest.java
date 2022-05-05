@@ -52,7 +52,7 @@ public class ByteBuddyAnnotationTest {
             classType.getDeclaredMethod("getAge", String.class).invoke(newInstance, "sean");
             classType.getMethod("getIdNumber", String.class).invoke(newInstance, "sean");
         } catch (ClassNotFoundException | InvocationTargetException | InstantiationException
-                | IllegalAccessException | NoSuchMethodException e) {
+                 | IllegalAccessException | NoSuchMethodException e) {
             e.printStackTrace();
         }
     }
@@ -78,7 +78,7 @@ public class ByteBuddyAnnotationTest {
             classType.getDeclaredMethod("getAge", String.class).invoke(newInstance, "sean");
             classType.getMethod("getIdNumber", String.class).invoke(newInstance, "sean");
         } catch (ClassNotFoundException | InvocationTargetException | InstantiationException
-                | IllegalAccessException | NoSuchMethodException e) {
+                 | IllegalAccessException | NoSuchMethodException e) {
             e.printStackTrace();
         }
     }
@@ -105,7 +105,7 @@ public class ByteBuddyAnnotationTest {
             classType.getDeclaredMethod("getAge", String.class).invoke(newInstance, "sean age");
             classType.getMethod("getIdNumber", String.class).invoke(newInstance, "sean id");
         } catch (ClassNotFoundException | InvocationTargetException | InstantiationException
-                | IllegalAccessException | NoSuchMethodException e) {
+                 | IllegalAccessException | NoSuchMethodException e) {
             e.printStackTrace();
         }
     }
@@ -130,7 +130,7 @@ public class ByteBuddyAnnotationTest {
             classType.getDeclaredMethod("getAge", String.class).invoke(newInstance, "sean age");
             classType.getMethod("getIdNumber", String.class).invoke(newInstance, "sean id");
         } catch (ClassNotFoundException | InvocationTargetException | InstantiationException
-                | IllegalAccessException | NoSuchMethodException e) {
+                 | IllegalAccessException | NoSuchMethodException e) {
             e.printStackTrace();
         }
     }
@@ -150,14 +150,12 @@ public class ByteBuddyAnnotationTest {
 
         try {
             Class<?> classType = classLoader.loadClass(BrianService.class.getName());
-//            Object newInstance = classType.getDeclaredConstructor(OvUserService.class).setAccessible(true)
-//            Constructor<?> declaredConstructor = classType.getDeclaredConstructor(OvUserService.class);
             Constructor<?> declaredConstructor = classType.getDeclaredConstructor();
             Object newInstance = declaredConstructor.newInstance();
             // call method
             classType.getDeclaredMethod("testUs", boolean.class).invoke(newInstance, false);
         } catch (ClassNotFoundException | InvocationTargetException | InstantiationException
-                | IllegalAccessException | NoSuchMethodException e) {
+                 | IllegalAccessException | NoSuchMethodException e) {
             e.printStackTrace();
         }
     }
@@ -182,7 +180,7 @@ public class ByteBuddyAnnotationTest {
             // call method
             classType.getDeclaredMethod("testUs", boolean.class).invoke(newInstance, false);
         } catch (ClassNotFoundException | InvocationTargetException | InstantiationException
-                | IllegalAccessException | NoSuchMethodException e) {
+                 | IllegalAccessException | NoSuchMethodException e) {
             e.printStackTrace();
         }
     }

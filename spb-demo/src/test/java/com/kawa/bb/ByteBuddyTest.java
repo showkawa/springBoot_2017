@@ -116,7 +116,6 @@ public class ByteBuddyTest {
                     .subclass(UserService.class)
                     .name("com.kawa.mock.UserServiceMock")
                     .defineField("address", String.class)
-//                    .defineMethod("updateAddress",String.class)
                     .make()
                     .saveIn(new File("/home/un/code/springBoot_2017/spb-demo/target/classes"));
 

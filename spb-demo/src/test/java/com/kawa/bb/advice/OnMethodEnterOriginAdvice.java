@@ -19,7 +19,7 @@ public class OnMethodEnterOriginAdvice {
     }
 
     @Advice.OnMethodExit
-    public static void exit(@Advice.Enter Object value) { // todo type need update to boolean
+    public static void exit(@Advice.Return Object value) { // todo type need update to boolean
         System.out.println("----- OnMethodEnterOriginAdvice ----- exit");
         System.out.println(">>>>> target value " + value);
     }
