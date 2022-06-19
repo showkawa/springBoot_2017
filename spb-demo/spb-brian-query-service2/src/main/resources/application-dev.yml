@@ -6,9 +6,34 @@ spring:
 #    password: 123456
 #    type: com.alibaba.druid.pool.DruidDataSource
 #    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:postgresql://49.233.143.198:5432/postgres
+    username: postgres
+    password: 10086
+    driver-class-name: org.postgresql.Driver
+  flyway:
+    # flyway自动配置 true 开启
+    enabled: true
+    #设定 SQL 脚本的目录,多个路径使用逗号分隔, 比如取值为 classpath:db/migration,filesystem:/sql-migrations
+    locations:
+      - classpath:db/migration
+    # 如果数据库不是空表，需要设置成 true，否则启动报错
+    baseline-on-migrate: true
+    # 与 baseline-on-migrate: true 搭配使用
+    baseline-version: 0
+    encoding: UTF-8
+    # 开发环境最好开启 outOfOrder, 生产环境关闭 outOfOrder .
+    out-of-order: false
+    # 禁止清理数据库表
+    clean-disabled: true
+    # 校验
+    validate-on-migrate: true
+    # 版本控制日志表，默认flyway_schema_history,不同系统建议修改改数据
+    table: flyway_schema_history
 
 
-#服务名
+
+
+  #服务名
   application:
     name: brian-query-service
 #quartz
