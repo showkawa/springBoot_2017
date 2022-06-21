@@ -52,7 +52,7 @@ spring:
             #选择quartz的事务，其通过JobStoreTX来管理
             class: org.quartz.impl.jdbcjobstore.JobStoreTX
             #DB使用的驱动代理
-            driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+            driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
             #开启集群配置
             isClustered: true
             #调整for update强制走主库
@@ -91,3 +91,6 @@ eureka:
   client:
     serviceUrl:
       defaultZone: http://localhost:8001/eureka/
+
+server:
+  port: ${random.int[2000,8000]}
